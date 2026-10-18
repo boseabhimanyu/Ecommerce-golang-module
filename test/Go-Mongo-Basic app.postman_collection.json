@@ -1,0 +1,1386 @@
+{
+  "info": {
+    "_postman_id": "d4e99a0d-1996-499e-b3b4-d4d0cc912246",
+    "name": "Go-Mongo-Basic app",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "27437251",
+    "_collection_link": "https://go.postman.co/collection/27437251-d4e99a0d-1996-499e-b3b4-d4d0cc912246?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "Users",
+      "item": [
+        {
+          "name": "Register",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firstName\": \"Priya\",\n  \"lastName\": \"Pathak\",\n  \"username\": \"priyap\",\n  \"email\": \"priya@example.com\",\n//   \"altEmail\": \"neeraj@example.com\",\n  \"phone\": \"9685745896\",\n  \"password\": \"Password@123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:{{port}}/api/v1/auth/register",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "{{port}}",
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "register"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"identifier\": \"johnf\",\n  \"password\": \"Password@123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:{{port}}/api/v1/auth/login",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "{{port}}",
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "login"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"identifier\": \"suresh12\",\n  \"password\": \"Password@123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:{{port}}/api/v1/auth/logout",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "{{port}}",
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "logout"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Me",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"identifier\": \"suresh12\",\n  \"password\": \"Password@123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:{{port}}/api/v1/auth/me",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "{{port}}",
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "me"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update profile info",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "// {\n//   \"firstName\": \"Suresh\",\n//   \"lastName\": \"Raina\",\n//   \"username\": \"suresh12\",\n//   \"email\": \"suresh@example.com\",\n//   \"altEmail\": \"suresh.alt@example.com\",\n//   \"phone\": \"9876543210\",\n//   \"dateOfBirth\": \"1990-12-15T00:00:00Z\",\n//   \"addressLine1\": \"12 Marine Drive\",\n//   \"addressLine2\": \"Near Gateway of India\",\n//   \"city\": \"Mumbai\",\n//   \"state\": \"Maharashtra\",\n//   \"pinCode\": \"400001\"\n// }\n\n{\n//   \"firstName\": \"John\",\n//   \"lastName\": \"Fatso\",\n//   \"username\": \"suresh12\",\n//   \"email\": \"priya@example.com\",\n  \"altEmail\": \"rahul.alt@example.com\",\n//   \"phone\": \"9685745678\",\n  \"dateOfBirth\": \"16-07-1986\",\n  \"addressLine1\": \"Jessore Road\",\n  \"addressLine2\": \"\",\n  \"city\": \"Madhyamgram\",\n  \"state\": \"West Bengal\",\n  \"pinCode\": \"700129\"\n}\n\n",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:{{port}}/api/v1/auth/me",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "{{port}}",
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "me"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Upload/update profile image",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "profile_pic",
+                  "type": "file",
+                  "uuid": "be3b3e34-d677-442c-ad65-2bef60a43b49",
+                  "value": null
+                }
+              ]
+            },
+            "url": {
+              "raw": "http://localhost:{{port}}/api/v1/auth/me/image",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "{{port}}",
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "me",
+                "image"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update password",
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"currentPassword\": \"Password@123\",\n  \"newPassword\": \"Cat@1234\"\n}\n",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:{{port}}/api/v1/auth/password",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "{{port}}",
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "password"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Start setup 2FA",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:{{port}}/api/v1/auth/2fa/setup",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "{{port}}",
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "2fa",
+                "setup"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Verify setup 2FA",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"code\": \"658856\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:{{port}}/api/v1/auth/2fa/verify-setup",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "{{port}}",
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "2fa",
+                "verify-setup"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Disable 2FA",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"code\": \"158898\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:{{port}}/api/v1/auth/2fa/disable",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "{{port}}",
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "2fa",
+                "disable"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Regenerate backup codes",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"code\": \"455282\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:{{port}}/api/v1/auth/2fa/backup-codes/regenerate",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "{{port}}",
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "2fa",
+                "backup-codes",
+                "regenerate"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Login verify 2FA",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"challengeToken\": \"\",\n  \"code\": \"684616\"\n}\n\n// {\n//   \"challengeToken\": \"YOUR_CHALLENGE_TOKEN\",\n//   \"code\": \"123456\"\n// }",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:{{port}}/api/v1/auth/2fa/verify-login",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "{{port}}",
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "2fa",
+                "verify-login"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Admin",
+      "item": [
+        {
+          "name": "Customer management",
+          "item": [
+            {
+              "name": "Create customer",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "// {\n//   \"firstName\": \"Rahul\",\n//   \"lastName\": \"Sharma\",\n//   \"username\": \"rahulsharma\",\n//   \"email\": \"rahul@example.com\",\n//   \"altEmail\": \"rahul.personal@example.com\",\n//   \"phone\": \"9876543210\",\n//   \"password\": \"Password@123\"\n// }\n\n{\n  \"firstName\": \"Sweta\",\n  \"lastName\": \"Tiwari\",\n  \"username\": \"sweta\",\n  \"email\": \"sweta@example.com\",\n//   \"altEmail\": \"ramesh.alt@example.com\",\n  \"phone\": \"6952655445\",\n  \"password\": \"Password@123\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:{{port}}/api/v1/customers",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "{{port}}",
+                  "path": [
+                    "api",
+                    "v1",
+                    "customers"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Update customer",
+              "request": {
+                "method": "PATCH",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "// {\n//   \"firstName\": \"Rahul\",\n//   \"lastName\": \"Sharma\",\n//   \"username\": \"rahulsharma\",\n//   \"email\": \"rahul@example.com\",\n//   \"altEmail\": \"rahul.personal@example.com\",\n//   \"phone\": \"9876543210\",\n//   \"dateOfBirth\": \"15-12-1990\",\n//   \"addressLine1\": \"12 MG Road\",\n//   \"addressLine2\": \"Near Metro Station\",\n//   \"city\": \"Bengaluru\",\n//   \"state\": \"Karnataka\",\n//   \"pinCode\": \"560001\"\n// }\n\n{\n  \"firstName\": \"Rahul\",\n  \"lastName\": \"Sharma\",\n  \"username\": \"rahulsharma\",\n  \"email\": \"rahul@example.com\",\n  \"altEmail\": \"rahul.personal@example.com\",\n  \"phone\": \"9876543210\",\n  \"dateOfBirth\": \"15-12-1990\",\n  \"addressLine1\": \"12 MG Road\",\n  \"addressLine2\": \"Near Metro Station\",\n  \"city\": \"Bengaluru\",\n  \"state\": \"Karnataka\",\n  \"pinCode\": \"560001\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:{{port}}/api/v1/customers/:id",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "{{port}}",
+                  "path": [
+                    "api",
+                    "v1",
+                    "customers",
+                    ":id"
+                  ],
+                  "variable": [
+                    {
+                      "key": "id",
+                      "value": ""
+                    }
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Search customers",
+              "protocolProfileBehavior": {
+                "disableBodyPruning": true
+              },
+              "request": {
+                "method": "GET",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "// {\n//   \"firstName\": \"Rahul\",\n//   \"lastName\": \"Sharma\",\n//   \"username\": \"rahulsharma\",\n//   \"email\": \"rahul@example.com\",\n//   \"altEmail\": \"rahul.personal@example.com\",\n//   \"phone\": \"9876543210\",\n//   \"password\": \"Password@123\"\n// }\n\n{\n  \"firstName\": \"Rahul\",\n  \"lastName\": \"Sharma\",\n  \"username\": \"rahulsharma\",\n  \"email\": \"rahul@example.com\",\n  \"phone\": \"6952365414\",\n  \"password\": \"Password@123\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:{{port}}/api/v1/customers?search=ramesh",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "{{port}}",
+                  "path": [
+                    "api",
+                    "v1",
+                    "customers"
+                  ],
+                  "query": [
+                    {
+                      "key": "search",
+                      "value": "ramesh"
+                    }
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Change customer status",
+              "request": {
+                "method": "PATCH",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"status\": true\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:{{port}}/api/v1/customers/6aa2d2bb102f1f260ac1d5a0/status",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "{{port}}",
+                  "path": [
+                    "api",
+                    "v1",
+                    "customers",
+                    "6aa2d2bb102f1f260ac1d5a0",
+                    "status"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Reset 2FA for customer",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"status\": true\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:{{port}}/api/v1/customers/6abccfa0290c23a6e22544bb/2fa/reset",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "{{port}}",
+                  "path": [
+                    "api",
+                    "v1",
+                    "customers",
+                    "6abccfa0290c23a6e22544bb",
+                    "2fa",
+                    "reset"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Change customer password",
+              "request": {
+                "method": "PATCH",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"newPassword\": \"Cat@1234\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:{{port}}/api/v1/customers/6ac8ea3a4a482e9c1907e65f/password",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "{{port}}",
+                  "path": [
+                    "api",
+                    "v1",
+                    "customers",
+                    "6ac8ea3a4a482e9c1907e65f",
+                    "password"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Get customers by ID",
+              "protocolProfileBehavior": {
+                "disableBodyPruning": true
+              },
+              "request": {
+                "method": "GET",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "// {\n//   \"firstName\": \"Rahul\",\n//   \"lastName\": \"Sharma\",\n//   \"username\": \"rahulsharma\",\n//   \"email\": \"rahul@example.com\",\n//   \"altEmail\": \"rahul.personal@example.com\",\n//   \"phone\": \"9876543210\",\n//   \"password\": \"Password@123\"\n// }\n\n{\n  \"firstName\": \"Rahul\",\n  \"lastName\": \"Sharma\",\n  \"username\": \"rahulsharma\",\n  \"email\": \"rahul@example.com\",\n  \"phone\": \"6952365414\",\n  \"password\": \"Password@123\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:{{port}}/api/v1/customers/6aae0a4123727bd8c5e1f85e",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "{{port}}",
+                  "path": [
+                    "api",
+                    "v1",
+                    "customers",
+                    "6aae0a4123727bd8c5e1f85e"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Settings",
+          "item": [
+            {
+              "name": "Global Settings on/off",
+              "request": {
+                "method": "PATCH",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "// {\n//     \"registration_enabled\" : true,\n//     \"two_factor_enabled\": false,\n//     \"login_with_primary_email\": true,\n//   \"login_with_username\": true,\n//   \"login_with_phone\": false,\n//   \"login_with_alt_email\": false,\n//   \"menu_max_depth\": {\n//     \"top\": 4,\n//     \"left\": 3,\n//     \"bottom\": 2\n//   }\n// }\n\n{\n  \"menu_max_depth\": {\n    \"top\": 3,\n    \"left\": 1,\n    \"bottom\": 2\n  }\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:{{port}}/api/v1/admin/settings",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "{{port}}",
+                  "path": [
+                    "api",
+                    "v1",
+                    "admin",
+                    "settings"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Get global settings",
+              "protocolProfileBehavior": {
+                "disableBodyPruning": true
+              },
+              "request": {
+                "method": "GET",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"registration_enabled\" : true,\n    \"two_factor_enabled\": false\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:{{port}}/api/v1/admin/settings",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "{{port}}",
+                  "path": [
+                    "api",
+                    "v1",
+                    "admin",
+                    "settings"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Pages",
+          "item": [
+            {
+              "name": "Create page",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "// {\n//   \"title\": \"About Us\",\n//   \"content\": \"About Us page\",\n//   \"visibility\" : \"public\"/\"registered\"\n// }\n\n{\n  \"title\": \"Website Development Porfolio\",\n  \"content\": \"With extensive experience in providing effective web and mobility solutions, we help our clients scale-up their business and generate high revenue. Our expert professionals work diligently to customize business solutions for your specific industry niche by conducting thorough market research and competitor analysis.\",\n  \"visibility\" : \"public\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:{{port}}/api/v1/admin/pages",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "{{port}}",
+                  "path": [
+                    "api",
+                    "v1",
+                    "admin",
+                    "pages"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Get Pages",
+              "protocolProfileBehavior": {
+                "disableBodyPruning": true
+              },
+              "request": {
+                "method": "GET",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "\n\n// GET /api/v1/admin/pages\n// GET /api/v1/admin/pages?page=1&limit=20\n// GET /api/v1/admin/pages?visibility=public\n// GET /api/v1/admin/pages?visibility=registered\n// GET /api/v1/admin/pages?authorId=<id>\n\n// http://localhost:{{port}}/api/v1/admin/pages?page=1&limit=20&visibility=public&authorId=6aa2cfce102f1f260ac1d59f",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:{{port}}/api/v1/admin/pages?page=1&limit=20&visibility=public&authorId=6aa2cfce102f1f260ac1d59f",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "{{port}}",
+                  "path": [
+                    "api",
+                    "v1",
+                    "admin",
+                    "pages"
+                  ],
+                  "query": [
+                    {
+                      "key": "page",
+                      "value": "1"
+                    },
+                    {
+                      "key": "limit",
+                      "value": "20"
+                    },
+                    {
+                      "key": "visibility",
+                      "value": "public"
+                    },
+                    {
+                      "key": "authorId",
+                      "value": "6aa2cfce102f1f260ac1d59f"
+                    }
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Update Pages",
+              "request": {
+                "method": "PATCH",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "// {\n//   \"title\": \"Website Development Porfolio\",\n//   \"content\": \"A personal playground for 12+ years of product design bringing together product, UX, AI, and design systems. Take your time with hidden interactions and details throughout the experience\",\n//   \"visibility\" : \"public\"\n// }\n\n{\n    \"slug\" : \"\"\n    // \"content\" : \"Legency Media's agency site combines bold typography, interactive dithering and fluid motion to showcase its work across Webflow, search, AI visibility and conversion.\"\n\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:{{port}}/api/v1/admin/pages/6aba3a3de75925b3aec7e6c7",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "{{port}}",
+                  "path": [
+                    "api",
+                    "v1",
+                    "admin",
+                    "pages",
+                    "6aba3a3de75925b3aec7e6c7"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Delete Pages",
+              "request": {
+                "method": "DELETE",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:{{port}}/api/v1/admin/pages/6aba5b674b9982e2f951c103",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "{{port}}",
+                  "path": [
+                    "api",
+                    "v1",
+                    "admin",
+                    "pages",
+                    "6aba5b674b9982e2f951c103"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Menus",
+          "item": [
+            {
+              "name": "Menu items",
+              "item": [
+                {
+                  "name": "Add item to Menu by ID",
+                  "request": {
+                    "method": "POST",
+                    "header": [],
+                    "body": {
+                      "mode": "raw",
+                      "raw": "\n\n\n{ \n    \"label\": \"Extra Links\", \n    \"type\": \"group\",\n    // \"url\": \"https://en.wikipedia.org/wiki/Asa_Briggs\",\n   \"parentId\": \"6abf4388367f442e95f84f9e\"\n}",
+                      "options": {
+                        "raw": {
+                          "language": "json"
+                        }
+                      }
+                    },
+                    "url": {
+                      "raw": "http://localhost:{{port}}/api/v1/admin/menus/6abf42e3367f442e95f84f97/items",
+                      "protocol": "http",
+                      "host": [
+                        "localhost"
+                      ],
+                      "port": "{{port}}",
+                      "path": [
+                        "api",
+                        "v1",
+                        "admin",
+                        "menus",
+                        "6abf42e3367f442e95f84f97",
+                        "items"
+                      ]
+                    },
+                    "description": "{ \"label\": \"External Links\", \"type\": \"group\"}  \n{ \"label\": \"Website Development Porfolio\", \"type\": \"page\", \"pageId\": \"6aba5dfc511673699987806e\"}  \n{ \"label\": \"Alan Turing\", \"type\": \"url\", \"url\": \"https://en.wikipedia.org/wiki/Alan_Turing\", \"parentId\": \"6abe87fa7a9a7851ff85005b\"}"
+                  },
+                  "response": []
+                },
+                {
+                  "name": "Update item in Menu by ID",
+                  "request": {
+                    "method": "PATCH",
+                    "header": [],
+                    "body": {
+                      "mode": "raw",
+                      "raw": "// {\n//   \"label\": \"Our Story\",\n//   \"displayStatus\": false,\n//   \"type\": \"page\",\"group\",\"url\"\n//   \"url\": \"https://chatgpt.com\",\n//   \"pageId\": \"YOUR_HOME_PAGE_ID\"\n// }\n\n{\n    \"label\": \"Education\",\n     \"type\": \"group\",\n   //   \"url\": \"https://en.wikipedia.org/wiki/Enigma_machine\"\n   \"pageId\": \"YOUR_HOME_PAGE_ID\"\n}",
+                      "options": {
+                        "raw": {
+                          "language": "json"
+                        }
+                      }
+                    },
+                    "url": {
+                      "raw": "http://localhost:{{port}}/api/v1/admin/menus/6abdfcf804e717d520cd107e/items/6abe8a0b7a9a7851ff85005d",
+                      "protocol": "http",
+                      "host": [
+                        "localhost"
+                      ],
+                      "port": "{{port}}",
+                      "path": [
+                        "api",
+                        "v1",
+                        "admin",
+                        "menus",
+                        "6abdfcf804e717d520cd107e",
+                        "items",
+                        "6abe8a0b7a9a7851ff85005d"
+                      ]
+                    }
+                  },
+                  "response": []
+                },
+                {
+                  "name": "Move item in Menu by ID",
+                  "request": {
+                    "method": "PATCH",
+                    "header": [],
+                    "body": {
+                      "mode": "raw",
+                      "raw": "{\n\"order\":2\n}",
+                      "options": {
+                        "raw": {
+                          "language": "json"
+                        }
+                      }
+                    },
+                    "url": {
+                      "raw": "http://localhost:{{port}}/api/v1/admin/menus/6abdfc3304e717d520cd107b/items/6abe8f637a9a7851ff850064/order",
+                      "protocol": "http",
+                      "host": [
+                        "localhost"
+                      ],
+                      "port": "{{port}}",
+                      "path": [
+                        "api",
+                        "v1",
+                        "admin",
+                        "menus",
+                        "6abdfc3304e717d520cd107b",
+                        "items",
+                        "6abe8f637a9a7851ff850064",
+                        "order"
+                      ]
+                    }
+                  },
+                  "response": []
+                },
+                {
+                  "name": "Delete item in Menu by ID",
+                  "request": {
+                    "method": "DELETE",
+                    "header": [],
+                    "body": {
+                      "mode": "raw",
+                      "raw": "// {\n//   \"label\": \"Our Story\",\n//   \"displayStatus\": false,\n//   \"type\": \"page\",\"group\",\"url\"\n//   \"url\": \"https://chatgpt.com\",\n//   \"pageId\": \"YOUR_HOME_PAGE_ID\"\n// }\n\n{\n    \"label\": \"AI Engine\",\n     \"type\": \"group\"\n}",
+                      "options": {
+                        "raw": {
+                          "language": "json"
+                        }
+                      }
+                    },
+                    "url": {
+                      "raw": "http://localhost:{{port}}/api/v1/admin/menus/6abdfc3304e717d520cd107b/items/6abe99b61c2ad7d15bc3c54b",
+                      "protocol": "http",
+                      "host": [
+                        "localhost"
+                      ],
+                      "port": "{{port}}",
+                      "path": [
+                        "api",
+                        "v1",
+                        "admin",
+                        "menus",
+                        "6abdfc3304e717d520cd107b",
+                        "items",
+                        "6abe99b61c2ad7d15bc3c54b"
+                      ]
+                    }
+                  },
+                  "response": []
+                }
+              ]
+            },
+            {
+              "name": "Create menu",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "//works only once to initialize\n\n{\n  \"name\": \"Left menu\",\n  \"location\": \"left\", // top,bottom,left\n  \"status\": true\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:{{port}}/api/v1/admin/menus",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "{{port}}",
+                  "path": [
+                    "api",
+                    "v1",
+                    "admin",
+                    "menus"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Get All Menus",
+              "protocolProfileBehavior": {
+                "disableBodyPruning": true
+              },
+              "request": {
+                "method": "GET",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "//works only once to initialize\n\n{\n  \"name\": \"Bottom Menu\",\n  \"location\": \"bottom\", // top,bottom,left\n  \"status\": true,\n  \"items\": []\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:{{port}}/api/v1/admin/menus",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "{{port}}",
+                  "path": [
+                    "api",
+                    "v1",
+                    "admin",
+                    "menus"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Get Menu by ID",
+              "protocolProfileBehavior": {
+                "disableBodyPruning": true
+              },
+              "request": {
+                "method": "GET",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "//works only once to initialize\n\n{\n  \"name\": \"Bottom Menu\",\n  \"location\": \"bottom\", // top,bottom,left\n  \"status\": true,\n  \"items\": []\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:{{port}}/api/v1/admin/menus/6abf3cc5a8b0c945d4bb739c",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "{{port}}",
+                  "path": [
+                    "api",
+                    "v1",
+                    "admin",
+                    "menus",
+                    "6abf3cc5a8b0c945d4bb739c"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Update Menu by ID",
+              "request": {
+                "method": "PATCH",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  //\"name\": \"Main Navigation\",\n  \"status\": true\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:{{port}}/api/v1/admin/menus/6abdfc3304e717d520cd107b",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "{{port}}",
+                  "path": [
+                    "api",
+                    "v1",
+                    "admin",
+                    "menus",
+                    "6abdfc3304e717d520cd107b"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Delete Menu by ID",
+              "request": {
+                "method": "DELETE",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "//works only once to initialize\n\n{\n  \"name\": \"Bottom Menu\",\n  \"location\": \"bottom\", // top,bottom,left\n  \"status\": true,\n  \"items\": []\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:{{port}}/api/v1/admin/menus/6abdfc3304e717d520cd107b",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "{{port}}",
+                  "path": [
+                    "api",
+                    "v1",
+                    "admin",
+                    "menus",
+                    "6abdfc3304e717d520cd107b"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Public links",
+      "item": [
+        {
+          "name": "CORS check",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "OPTIONS",
+            "header": [
+              {
+                "key": "Origin",
+                "value": "http://localhost:3000",
+                "type": "text"
+              },
+              {
+                "key": "Access-Control-Request-Method",
+                "value": "POST",
+                "type": "text"
+              },
+              {
+                "key": "Access-Control-Request-Headers",
+                "value": "content-type",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:4000/api/v1/auth/login",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "4000",
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "login"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "health",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Origin",
+                "value": "http://localhost:3000",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:{{port}}/health",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "{{port}}",
+              "path": [
+                "health"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Ready",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:{{port}}/ready",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "{{port}}",
+              "path": [
+                "ready"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Public user registration status",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:{{port}}/api/v1/settings",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "{{port}}",
+              "path": [
+                "api",
+                "v1",
+                "settings"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get pages by slug",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "// {\n//   \"title\": \"About Us\",\n//   \"content\": \"About Us page\",\n//   \"visibility\" : \"public\"/\"registered\"\n// }\n\n{\n  \"title\": \"Website Development\",\n  \"content\": \"With extensive experience in providing effective web and mobility solutions, we help our clients scale-up their business and generate high revenue. Our expert professionals work diligently to customize business solutions for your specific industry niche by conducting thorough market research and competitor analysis.\",\n  \"visibility\" : \"registered\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:{{port}}/api/v1/pages/about-uss",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "{{port}}",
+              "path": [
+                "api",
+                "v1",
+                "pages",
+                "about-uss"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get menu by location",
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "// {\n//   \"title\": \"About Us\",\n//   \"content\": \"About Us page\",\n//   \"visibility\" : \"public\"/\"registered\"\n// }\n\nhttp://localhost:{{port}}/api/v1/menus/bottom\nhttp://localhost:{{port}}/api/v1/menus/top\nhttp://localhost:{{port}}/api/v1/menus/left"
+            },
+            "url": {
+              "raw": "http://localhost:{{port}}/api/v1/menus/left",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "{{port}}",
+              "path": [
+                "api",
+                "v1",
+                "menus",
+                "left"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Refresh token",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"identifier\": \"suresh12\",\n  \"password\": \"Password@123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:{{port}}/api/v1/auth/refresh",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "{{port}}",
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "refresh"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "port",
+      "value": ""
+    }
+  ]
+}

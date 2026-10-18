@@ -1,0 +1,603 @@
+package services
+
+import (
+	"basic-app/apperrors"
+	"basic-app/auth"
+	"basic-app/config"
+
+	"basic-app/dto"
+	"basic-app/models"
+	"basic-app/repository"
+
+	"basic-app/validation"
+	"context"
+	"errors"
+	"strings"
+	"time"
+
+	"golang.org/x/crypto/bcrypt"
+)
+
+type AuthService struct {
+	userRepository         repository.UserRepository
+	refreshTokenRepository repository.RefreshTokenRepository
+	settingsService        *SettingsService
+	totpService            *TOTPService
+	config                 config.Config
+}
+
+func NewAuthService(
+	userRepository repository.UserRepository,
+	refreshTokenRepository repository.RefreshTokenRepository,
+	settingsService *SettingsService,
+	totpService *TOTPService,
+	cfg config.Config,
+) *AuthService {
+	return &AuthService{
+		userRepository:         userRepository,
+		refreshTokenRepository: refreshTokenRepository,
+		settingsService:        settingsService,
+		totpService:            totpService,
+		config:                 cfg,
+	}
+}
+
+// RegisterCustomer creates a new customer account.
+
+func (s *AuthService) RegisterUser(
+	ctx context.Context,
+	req *dto.RegisterRequest,
+) (*models.User, error) {
+
+	registrationEnabled, err := s.settingsService.IsRegistrationEnabled(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	if !registrationEnabled {
+		return nil, apperrors.ErrRegistrationDisabled
+	}
+
+	firstName, err := validation.ValidateName(
+		req.FirstName,
+		"first name",
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	lastName, err := validation.ValidateName(
+		req.LastName,
+		"last name",
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	username, err := validation.ValidateUsername(req.Username)
+	if err != nil {
+		return nil, err
+	}
+
+	email, err := validation.ValidateEmail(req.Email, true)
+	if err != nil {
+		return nil, err
+	}
+
+	altEmail, err := validation.ValidateEmail(req.AltEmail, false)
+	if err != nil {
+		return nil, err
+	}
+
+	if altEmail != "" && altEmail == email {
+		return nil, apperrors.ErrAltEmailSameAsEmail
+	}
+
+	phone, err := validation.ValidatePhone(req.Phone)
+	if err != nil {
+		return nil, err
+	}
+
+	if err := validation.ValidatePassword(req.Password); err != nil {
+		return nil, err
+	}
+
+	// Checks primary email against both email and alternate-email fields.
+	existingUser, err := s.userRepository.FindByAnyEmail(ctx, email)
+	if err == nil && existingUser != nil {
+		return nil, apperrors.ErrEmailAlreadyExists
+	}
+
+	if err != nil && !errors.Is(err, apperrors.ErrUserNotFound) {
+		return nil, err
+	}
+
+	// Checks optional alternate email against both email fields.
+	if altEmail != "" {
+		existingUser, err = s.userRepository.FindByAnyEmail(
+			ctx,
+			altEmail,
+		)
+		if err == nil && existingUser != nil {
+			return nil, apperrors.ErrAltEmailAlreadyExists
+		}
+
+		if err != nil && !errors.Is(
+			err,
+			apperrors.ErrUserNotFound,
+		) {
+			return nil, err
+		}
+	}
+
+	existingUser, err = s.userRepository.FindByUsername(ctx, username)
+	if err == nil && existingUser != nil {
+		return nil, apperrors.ErrUsernameAlreadyExists
+	}
+
+	if err != nil && !errors.Is(err, apperrors.ErrUserNotFound) {
+		return nil, err
+	}
+
+	existingUser, err = s.userRepository.FindByPhone(ctx, phone)
+	if err == nil && existingUser != nil {
+		return nil, apperrors.ErrPhoneAlreadyExists
+	}
+
+	if err != nil && !errors.Is(err, apperrors.ErrUserNotFound) {
+		return nil, err
+	}
+
+	passwordHash, err := bcrypt.GenerateFromPassword(
+		[]byte(req.Password),
+		bcrypt.DefaultCost,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	user := models.NewCustomerUser()
+
+	user.FirstName = firstName
+	user.LastName = lastName
+	user.Username = username
+	user.Email = email
+	user.AltEmail = altEmail
+	user.Phone = phone
+	user.PasswordHash = string(passwordHash)
+
+	if err := s.userRepository.Create(ctx, &user); err != nil {
+		return nil, err
+	}
+
+	return &user, nil
+}
+
+// ChangePassword changes a user's password.
+func (s *AuthService) ChangePassword(
+	ctx context.Context,
+	userID string,
+	req *dto.ChangePasswordRequest,
+) error {
+	if req == nil {
+		return errors.New("change password request is required")
+	}
+
+	userID = strings.TrimSpace(userID)
+	if userID == "" {
+		return apperrors.ErrInvalidUserID
+	}
+
+	// Do not trim passwords.
+	currentPassword := req.CurrentPassword
+	newPassword := req.NewPassword
+
+	if err := validation.ValidatePassword(newPassword); err != nil {
+		return err
+	}
+
+	user, err := s.userRepository.FindByID(ctx, userID)
+	if err != nil {
+		return err
+	}
+
+	// Verify the user's current password.
+	if err := bcrypt.CompareHashAndPassword(
+		[]byte(user.PasswordHash),
+		[]byte(currentPassword),
+	); err != nil {
+		return apperrors.ErrInvalidPassword
+	}
+
+	// Hash the new password.
+	passwordHash, err := bcrypt.GenerateFromPassword(
+		[]byte(newPassword),
+		bcrypt.DefaultCost,
+	)
+	if err != nil {
+		return err
+	}
+
+	return s.userRepository.UpdatePassword(
+		ctx,
+		userID,
+		string(passwordHash),
+	)
+}
+
+func (s *AuthService) Login(
+	ctx context.Context,
+	req *dto.LoginRequest,
+) (*dto.LoginResult, error) {
+	identifier := strings.ToLower(
+		strings.TrimSpace(req.Identifier),
+	)
+
+	if identifier == "" || req.Password == "" {
+		return nil, apperrors.ErrInvalidCredentials
+	}
+
+	user, err := s.userRepository.FindByLoginIdentifier(
+		ctx,
+		identifier,
+	)
+
+	if err != nil {
+		if errors.Is(err, apperrors.ErrUserNotFound) {
+			return nil, apperrors.ErrInvalidCredentials
+		}
+
+		return nil, err
+	}
+
+	settings, err := s.settingsService.GetSettings(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	loginAllowed := false
+
+	switch identifier {
+	case strings.ToLower(user.Username):
+		loginAllowed = settings.LoginWithUsername
+
+	case strings.ToLower(user.Email):
+		loginAllowed = settings.LoginWithPrimaryEmail
+
+	case strings.ToLower(user.AltEmail):
+		loginAllowed = settings.LoginWithAltEmail
+
+	case user.Phone:
+		loginAllowed = settings.LoginWithPhone
+	}
+
+	if !loginAllowed {
+		return nil, apperrors.ErrInvalidCredentials
+	}
+
+	if !user.Status {
+		return nil, apperrors.ErrInvalidCredentials
+	}
+
+	if err := bcrypt.CompareHashAndPassword(
+		[]byte(user.PasswordHash),
+		[]byte(req.Password),
+	); err != nil {
+		return nil, apperrors.ErrInvalidCredentials
+	}
+
+	backupCodesRemaining := 0
+	backupCodesLow := false
+
+	if user.TwoFactorEnabled {
+		backupCodesRemaining = len(user.BackupCodeHashes)
+		backupCodesLow = backupCodesRemaining <= s.config.BackupCodeLowThreshold
+	}
+
+	twoFactorEnabled, err := s.settingsService.IsTwoFactorEnabled(ctx)
+
+	if err != nil {
+		return nil, err
+	}
+
+	if twoFactorEnabled && user.TwoFactorEnabled {
+		challengeToken, err := auth.GenerateTwoFactorChallenge(
+			user.ID.Hex(),
+			s.config.JWTSecret,
+			5,
+		)
+		if err != nil {
+			return nil, err
+		}
+
+		return &dto.LoginResult{
+			User:                 user,
+			TwoFactorRequired:    true,
+			ChallengeToken:       challengeToken,
+			BackupCodesRemaining: backupCodesRemaining,
+			BackupCodesLow:       backupCodesLow,
+		}, nil
+	}
+
+	accessToken, err := auth.GenerateToken(
+		user.ID.Hex(),
+		string(user.Role),
+		s.config.JWTSecret,
+		s.config.JWTExpiryHours,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	refreshToken, refreshExpiry, err := auth.GenerateRefreshToken(
+		user.ID.Hex(),
+		s.config.JWTSecret,
+		s.config.RefreshTokenExpiryDays,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	refreshTokenModel := &models.RefreshToken{
+		UserID:    user.ID,
+		TokenHash: auth.HashRefreshToken(refreshToken),
+		ExpiresAt: refreshExpiry,
+	}
+
+	if err := s.refreshTokenRepository.Create(ctx, refreshTokenModel); err != nil {
+		return nil, err
+	}
+
+	now := time.Now().UTC()
+
+	if err := s.userRepository.UpdateLastLoginAt(
+		ctx,
+		user.ID.Hex(),
+		now,
+	); err != nil {
+		return nil, err
+	}
+
+	user.LastLoginAt = &now
+
+	return &dto.LoginResult{
+		User:                 user,
+		AccessToken:          accessToken,
+		RefreshToken:         refreshToken,
+		RefreshExpiry:        refreshExpiry,
+		BackupCodesRemaining: backupCodesRemaining,
+		BackupCodesLow:       backupCodesLow,
+	}, nil
+}
+
+func (s *AuthService) RefreshToken(ctx context.Context, refreshToken string) (*dto.RefreshResult, error) {
+	claims, err := auth.ValidateRefreshToken(refreshToken, s.config.JWTSecret)
+	if err != nil {
+		return nil, apperrors.ErrInvalidRefreshToken
+	}
+
+	user, err := s.userRepository.FindByID(ctx, claims.UserID)
+	if err != nil {
+		return nil, apperrors.ErrInvalidRefreshToken
+	}
+
+	if !user.Status {
+		return nil, apperrors.ErrInvalidRefreshToken
+	}
+
+	tokenHash := auth.HashRefreshToken(refreshToken)
+
+	storedToken, err := s.refreshTokenRepository.FindByTokenHash(ctx, tokenHash)
+	if err != nil {
+		return nil, apperrors.ErrInvalidRefreshToken
+	}
+
+	accessToken, err := auth.GenerateToken(
+		user.ID.Hex(),
+		string(user.Role),
+		s.config.JWTSecret,
+		s.config.JWTExpiryHours,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	if err := s.refreshTokenRepository.Touch(ctx, storedToken.ID.Hex()); err != nil {
+		return nil, err
+	}
+
+	return &dto.RefreshResult{
+		AccessToken:   accessToken,
+		RefreshToken:  refreshToken,
+		RefreshExpiry: storedToken.ExpiresAt,
+	}, nil
+}
+
+func (s *AuthService) Logout(ctx context.Context, refreshToken string) error {
+	claims, err := auth.ValidateRefreshToken(refreshToken, s.config.JWTSecret)
+	if err != nil {
+		return apperrors.ErrInvalidRefreshToken
+	}
+
+	// Make sure the user still exists.
+	if _, err := s.userRepository.FindByID(ctx, claims.UserID); err != nil {
+		return apperrors.ErrInvalidRefreshToken
+	}
+
+	tokenHash := auth.HashRefreshToken(refreshToken)
+
+	storedToken, err := s.refreshTokenRepository.FindByTokenHash(ctx, tokenHash)
+	if err != nil {
+		return apperrors.ErrInvalidRefreshToken
+	}
+
+	return s.refreshTokenRepository.Revoke(ctx, storedToken.ID.Hex())
+}
+
+func (s *AuthService) VerifyTwoFactorLogin(
+	ctx context.Context,
+	req *dto.VerifyTwoFactorLoginRequest,
+) (*dto.LoginResult, error) {
+	challenge := strings.TrimSpace(req.ChallengeToken)
+	code := strings.TrimSpace(req.Code)
+
+	if challenge == "" || code == "" {
+		return nil, apperrors.ErrInvalidTOTPCode
+	}
+
+	claims, err := auth.ValidateTwoFactorChallenge(
+		challenge,
+		s.config.JWTSecret,
+	)
+	if err != nil {
+		return nil, apperrors.ErrInvalidTOTPCode
+	}
+
+	user, err := s.userRepository.FindByID(
+		ctx,
+		claims.UserID,
+	)
+	if err != nil {
+		if errors.Is(err, apperrors.ErrUserNotFound) {
+			return nil, apperrors.ErrInvalidCredentials
+		}
+
+		return nil, err
+	}
+
+	if !user.Status || !user.TwoFactorEnabled {
+		return nil, apperrors.ErrInvalidCredentials
+	}
+
+	backupCodesRemaining := len(user.BackupCodeHashes)
+	backupCodesLow := backupCodesRemaining <= s.config.BackupCodeLowThreshold
+
+	if len(code) == 6 {
+		totpEncryptionService, err := s.getTOTPEncryptionService()
+		if err != nil {
+			return nil, err
+		}
+
+		decryptedSecret, err := totpEncryptionService.Decrypt(
+			user.TwoFactorSecret,
+		)
+
+		if err != nil {
+			return nil, apperrors.ErrInvalidTOTPCode
+		}
+
+		if err := s.totpService.VerifyCode(
+			decryptedSecret,
+			code,
+		); err != nil {
+			return nil, apperrors.ErrInvalidTOTPCode
+		}
+	} else {
+		backupCodesRemaining, err = s.verifyBackupCode(
+			ctx,
+			user,
+			code,
+		)
+		if err != nil {
+			return nil, apperrors.ErrInvalidTOTPCode
+		}
+
+		backupCodesLow = backupCodesRemaining <= s.config.BackupCodeLowThreshold
+	}
+
+	accessToken, err := auth.GenerateToken(
+		user.ID.Hex(),
+		string(user.Role),
+		s.config.JWTSecret,
+		s.config.JWTExpiryHours,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	refreshToken, refreshExpiry, err := auth.GenerateRefreshToken(
+		user.ID.Hex(),
+		s.config.JWTSecret,
+		s.config.RefreshTokenExpiryDays,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	refreshTokenModel := &models.RefreshToken{
+		UserID:    user.ID,
+		TokenHash: auth.HashRefreshToken(refreshToken),
+		ExpiresAt: refreshExpiry,
+	}
+
+	if err := s.refreshTokenRepository.Create(
+		ctx,
+		refreshTokenModel,
+	); err != nil {
+		return nil, err
+	}
+
+	now := time.Now().UTC()
+
+	if err := s.userRepository.UpdateLastLoginAt(
+		ctx,
+		user.ID.Hex(),
+		now,
+	); err != nil {
+		return nil, err
+	}
+
+	user.LastLoginAt = &now
+
+	return &dto.LoginResult{
+		User:                 user,
+		AccessToken:          accessToken,
+		RefreshToken:         refreshToken,
+		RefreshExpiry:        refreshExpiry,
+		BackupCodesRemaining: backupCodesRemaining,
+		BackupCodesLow:       backupCodesLow,
+	}, nil
+}
+
+func (s *AuthService) verifyBackupCode(
+	ctx context.Context,
+	user *models.User,
+	code string,
+) (int, error) {
+	code = strings.ToUpper(strings.TrimSpace(code))
+
+	if code == "" {
+		return 0, apperrors.ErrInvalidBackupCode
+	}
+
+	for index, hash := range user.BackupCodeHashes {
+		if err := bcrypt.CompareHashAndPassword(
+			[]byte(hash),
+			[]byte(code),
+		); err != nil {
+			continue
+		}
+
+		user.BackupCodeHashes = append(
+			user.BackupCodeHashes[:index],
+			user.BackupCodeHashes[index+1:]...,
+		)
+
+		if err := s.userRepository.Update(ctx, user); err != nil {
+			return 0, err
+		}
+
+		return len(user.BackupCodeHashes), nil
+	}
+
+	return 0, apperrors.ErrInvalidBackupCode
+}
+
+func (s *AuthService) getTOTPEncryptionService() (
+	*TOTPEncryptionService,
+	error,
+) {
+	return NewTOTPEncryptionService(
+		s.config.TOTPEncryptionKey,
+	)
+}
