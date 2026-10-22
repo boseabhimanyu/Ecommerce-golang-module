@@ -179,31 +179,6 @@ func (s *UserService) UpdateProfile(
 		hasUpdates = true
 	}
 
-	if req.AddressLine1 != nil {
-		user.AddressLine1 = strings.TrimSpace(*req.AddressLine1)
-		hasUpdates = true
-	}
-
-	if req.AddressLine2 != nil {
-		user.AddressLine2 = strings.TrimSpace(*req.AddressLine2)
-		hasUpdates = true
-	}
-
-	if req.City != nil {
-		user.City = strings.TrimSpace(*req.City)
-		hasUpdates = true
-	}
-
-	if req.State != nil {
-		user.State = strings.TrimSpace(*req.State)
-		hasUpdates = true
-	}
-
-	if req.PinCode != nil {
-		user.PinCode = strings.TrimSpace(*req.PinCode)
-		hasUpdates = true
-	}
-
 	if !hasUpdates {
 		return nil, apperrors.ErrNoFieldsToUpdate
 	}

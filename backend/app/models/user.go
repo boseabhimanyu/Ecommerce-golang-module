@@ -1,3 +1,4 @@
+// models/user.go
 package models
 
 import (
@@ -34,12 +35,6 @@ type User struct {
 	LastLoginAt *time.Time `bson:"last_login_at" json:"lastLoginAt"`
 	DateOfBirth *time.Time `bson:"date_of_birth" json:"dateOfBirth"`
 
-	AddressLine1 string `bson:"address_line_1" json:"addressLine1"`
-	AddressLine2 string `bson:"address_line_2" json:"addressLine2"`
-	City         string `bson:"city" json:"city"`
-	State        string `bson:"state" json:"state"`
-	PinCode      string `bson:"pin_code" json:"pinCode"`
-
 	TwoFactorEnabled       bool     `bson:"two_factor_enabled" json:"twoFactorEnabled"`
 	TwoFactorSecret        string   `bson:"two_factor_secret" json:"-"`
 	TwoFactorPendingSecret string   `bson:"two_factor_pending_secret" json:"-"`
@@ -48,7 +43,6 @@ type User struct {
 
 func NewCustomerUser() User {
 	now := time.Now().UTC()
-
 	return User{
 		Role:      RoleCustomer,
 		Status:    true,

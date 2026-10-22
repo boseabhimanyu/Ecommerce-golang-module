@@ -82,7 +82,7 @@ func NewRouter(
 	settingsService := services.NewSettingsService(settingsRepository, cfg)
 	totpService := services.NewTOTPService(cfg.TOTPIssuer)
 	refreshTokenRepository := mongorepo.NewRefreshTokenRepository(database)
-
+	addressRepo := mongorepo.NewAddressRepository(database)
 	authService := services.NewAuthService(
 		userRepository,
 		refreshTokenRepository,
@@ -164,6 +164,8 @@ func NewRouter(
 	menuHandler := handler.NewMenuHandler(menuService)
 	settingsHandler := handler.NewSettingsHandler(settingsService)
 
+	addressService := services.NewAddressService(addressRepo)
+	addressHandler := handler.NewAddressHandler(addressService)
 	// ------------------------------------------------------------------
 	// Health / readiness
 	// ------------------------------------------------------------------
@@ -261,6 +263,14 @@ func NewRouter(
 		protected.PATCH("/me", userHandler.UpdateProfile)
 		protected.PATCH("/me/image", userHandler.UpdateProfilePic)
 		protected.GET("/me", userHandler.Me)
+
+		// User addresses — authenticated user manages their own addresses
+		protected.POST("/addresses", addressHandler.CreateAddress)
+		protected.GET("/addresses", addressHandler.ListAddresses)
+		protected.GET("/addresses/:id", addressHandler.GetAddress)
+		protected.PATCH("/addresses/:id", addressHandler.UpdateAddress)
+		protected.PATCH("/addresses/:id/default", addressHandler.SetDefaultAddress)
+		protected.DELETE("/addresses/:id", addressHandler.DeleteAddress)
 
 		// 2FA setup
 		protected.POST(

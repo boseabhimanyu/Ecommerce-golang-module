@@ -7,18 +7,13 @@ import "basic-app/models"
 //
 // nil means the field was not provided.
 type UpdateUserProfileRequest struct {
-	FirstName    *string `json:"firstName"`
-	LastName     *string `json:"lastName"`
-	Username     *string `json:"username"`
-	Email        *string `json:"email"`
-	AltEmail     *string `json:"altEmail"`
-	Phone        *string `json:"phone"`
-	DateOfBirth  *string `json:"dateOfBirth"`
-	AddressLine1 *string `json:"addressLine1"`
-	AddressLine2 *string `json:"addressLine2"`
-	City         *string `json:"city"`
-	State        *string `json:"state"`
-	PinCode      *string `json:"pinCode"`
+	FirstName   *string `json:"firstName"`
+	LastName    *string `json:"lastName"`
+	Username    *string `json:"username"`
+	Email       *string `json:"email"`
+	AltEmail    *string `json:"altEmail"`
+	Phone       *string `json:"phone"`
+	DateOfBirth *string `json:"dateOfBirth"`
 }
 
 type ChangeUserPasswordRequest struct {
