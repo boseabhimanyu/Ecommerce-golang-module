@@ -104,19 +104,43 @@ func (h *AuthHandler) VerifyEmail(c *gin.Context) {
 }
 
 func (h *AuthHandler) ResendVerificationEmail(c *gin.Context) {
-	var req dto.ResendVerificationRequest
-	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid request body"})
+	userIDValue, exists := c.Get("userID")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"error": "unauthorized",
+		})
 		return
 	}
 
-	if err := h.authService.ResendVerificationEmail(c.Request.Context(), req.Email); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+	userID, ok := userIDValue.(string)
+	if !ok || strings.TrimSpace(userID) == "" {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"error": "unauthorized",
+		})
+		return
+	}
+
+	err := h.authService.ResendVerificationEmail(c.Request.Context(), userID)
+	if err != nil {
+		switch {
+		case errors.Is(err, apperrors.ErrEmailAlreadyVerified):
+			c.JSON(http.StatusBadRequest, gin.H{
+				"error": "email is already verified",
+			})
+		case errors.Is(err, apperrors.ErrInvalidUserID):
+			c.JSON(http.StatusUnauthorized, gin.H{
+				"error": "unauthorized",
+			})
+		default:
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"error": "failed to resend verification email",
+			})
+		}
 		return
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"message": "if an account with that email exists, a verification link has been sent",
+		"message": "verification email sent successfully",
 	})
 }
 
@@ -385,6 +409,11 @@ func (h *AuthHandler) StartTwoFactorSetup(c *gin.Context) {
 	)
 	if err != nil {
 		switch {
+		case errors.Is(err, apperrors.ErrEmailNotVerified):
+			c.JSON(http.StatusForbidden, gin.H{
+				"error": "Email verification required for enabling two-factor authentication",
+			})
+
 		case errors.Is(err, apperrors.ErrTwoFactorAlreadyEnabled):
 			c.JSON(http.StatusConflict, gin.H{
 				"error": err.Error(),
@@ -451,6 +480,11 @@ func (h *AuthHandler) VerifyTwoFactorSetup(c *gin.Context) {
 	)
 	if err != nil {
 		switch {
+		case errors.Is(err, apperrors.ErrEmailNotVerified): // <-- Added check
+			c.JSON(http.StatusForbidden, gin.H{
+				"error": "Email verification required for enabling two-factor authentication",
+			})
+
 		case errors.Is(err, apperrors.ErrTwoFactorAlreadyEnabled):
 			c.JSON(http.StatusConflict, gin.H{
 				"error": err.Error(),

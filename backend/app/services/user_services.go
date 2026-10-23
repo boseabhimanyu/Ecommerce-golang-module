@@ -646,6 +646,11 @@ func (s *UserService) StartTwoFactorSetup(
 		return "", "", apperrors.ErrInvalidCredentials
 	}
 
+	// Guard: only verified/registered users can initiate 2FA setup
+	if !user.IsEmailVerified {
+		return "", "", apperrors.ErrEmailNotVerified
+	}
+
 	if user.TwoFactorEnabled {
 		return "", "", apperrors.ErrTwoFactorAlreadyEnabled
 	}
@@ -694,6 +699,11 @@ func (s *UserService) VerifyTwoFactorSetup(
 
 	if !user.Status {
 		return nil, apperrors.ErrInvalidCredentials
+	}
+
+	// Guard: only verified/registered users can finalize 2FA setup
+	if !user.IsEmailVerified {
+		return nil, apperrors.ErrEmailNotVerified
 	}
 
 	if user.TwoFactorEnabled {

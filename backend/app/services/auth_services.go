@@ -662,26 +662,27 @@ func (s *AuthService) VerifyEmail(ctx context.Context, rawToken string) error {
 	return s.userRepository.Update(ctx, user)
 }
 
-func (s *AuthService) ResendVerificationEmail(ctx context.Context, email string) error {
-	cleanEmail, err := validation.ValidateEmail(email, true)
-	if err != nil {
-		return err
+func (s *AuthService) ResendVerificationEmail(ctx context.Context, userID string) error {
+	userID = strings.TrimSpace(userID)
+	if userID == "" {
+		return apperrors.ErrInvalidUserID
 	}
 
-	user, err := s.userRepository.FindByEmail(ctx, cleanEmail)
+	user, err := s.userRepository.FindByID(ctx, userID)
 	if err != nil {
-		// Don't leak user existence; return generic nil or handle gracefully
-		return nil
+		return err
 	}
 
 	if user.IsEmailVerified {
-		return errors.New("email is already verified")
+		return apperrors.ErrEmailAlreadyVerified
 	}
 
-	rawToken, err := utils.GenerateRandomToken(32)
-	if err != nil {
+	// Generate secure random 32-byte token
+	rawTokenBytes := make([]byte, 32)
+	if _, err := rand.Read(rawTokenBytes); err != nil {
 		return err
 	}
+	rawToken := hex.EncodeToString(rawTokenBytes)
 
 	tokenExpiry := time.Now().UTC().Add(s.emailVerificationExpiry)
 	user.EmailVerificationToken = utils.HashToken(rawToken)
@@ -692,9 +693,10 @@ func (s *AuthService) ResendVerificationEmail(ctx context.Context, email string)
 		return err
 	}
 
-	go func(targetEmail, targetName, token string) {
-		_ = s.emailService.SendVerificationEmail(targetEmail, targetName, token)
-	}(user.Email, user.FirstName, rawToken)
+	// Send email asynchronously using the user's verified record from DB
+	go func() {
+		_ = s.emailService.SendVerificationEmail(user.Email, user.FirstName, rawToken)
+	}()
 
 	return nil
 }

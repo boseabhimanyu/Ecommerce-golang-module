@@ -10,6 +10,8 @@ var (
 	ErrAltEmailSameAsEmail   = errors.New("alternate email must be different from primary email")
 	ErrUsernameAlreadyExists = errors.New("username already exists")
 	ErrPhoneAlreadyExists    = errors.New("phone number already exists")
+	ErrEmailNotVerified      = errors.New("Email not verified")
+	ErrEmailAlreadyVerified  = errors.New("Email already verified")
 
 	// Validation errors
 	ErrInvalidUserID       = errors.New("invalid user id")

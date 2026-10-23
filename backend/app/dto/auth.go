@@ -67,10 +67,6 @@ type VerifyEmailRequest struct {
 	Token string `json:"token"`
 }
 
-type ResendVerificationRequest struct {
-	Email string `json:"email"`
-}
-
 type ForgotPasswordRequest struct {
 	Email string `json:"email"`
 }

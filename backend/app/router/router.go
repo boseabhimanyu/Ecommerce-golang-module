@@ -269,7 +269,6 @@ func NewRouter(
 		)
 		// Email verification
 		authRoutes.POST("/verify-email", authHandler.VerifyEmail)
-		authRoutes.POST("/resend-verification", authHandler.ResendVerificationEmail)
 
 		// Password Reset
 		authRoutes.POST("/forgot-password", authHandler.ForgotPassword)
@@ -279,6 +278,7 @@ func NewRouter(
 		protected := authRoutes.Group("")
 		protected.Use(authMiddleware)
 
+		protected.POST("/resend-verification", authHandler.ResendVerificationEmail)
 		protected.PATCH("/password", authHandler.ChangePassword)
 		protected.POST("/logout", authHandler.Logout)
 		protected.PATCH("/me", userHandler.UpdateProfile)
