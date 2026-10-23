@@ -3,6 +3,7 @@ package router
 import (
 	"basic-app/auth"
 	"basic-app/config"
+	"basic-app/email"
 	"basic-app/middleware"
 
 	"basic-app/handler"
@@ -76,6 +77,12 @@ func NewRouter(
 	// Dependencies
 	// ------------------------------------------------------------------
 
+	frontendURL := "http://localhost:3000"
+	if len(cfg.AllowedOrigins) > 0 && cfg.AllowedOrigins[0] != "" {
+		frontendURL = cfg.AllowedOrigins[0]
+	}
+
+	emailService := email.NewLoggerEmailService(frontendURL)
 	userRepository := mongorepo.NewUserRepository(database)
 
 	settingsRepository := mongorepo.NewApplicationSettingsRepository(database)
@@ -89,6 +96,7 @@ func NewRouter(
 		settingsService,
 		totpService,
 		cfg,
+		emailService,
 	)
 
 	// Initialize application settings.
@@ -253,6 +261,9 @@ func NewRouter(
 			twoFactorLimiter.Middleware(middleware.RateLimitKeyByIP),
 			authHandler.VerifyTwoFactorLogin,
 		)
+
+		authRoutes.POST("/verify-email", authHandler.VerifyEmail)
+		authRoutes.POST("/resend-verification", authHandler.ResendVerificationEmail)
 
 		// Authenticated
 		protected := authRoutes.Group("")

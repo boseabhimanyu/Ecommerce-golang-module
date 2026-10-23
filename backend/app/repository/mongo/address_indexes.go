@@ -2,6 +2,7 @@ package mongo
 
 import (
 	"context"
+	"time"
 
 	"go.mongodb.org/mongo-driver/v2/bson"
 	driver "go.mongodb.org/mongo-driver/v2/mongo"
@@ -12,6 +13,9 @@ func EnsureAddressIndexes(
 	ctx context.Context,
 	db *driver.Database,
 ) error {
+	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
+	defer cancel()
+
 	collection := db.Collection("addresses")
 
 	models := []driver.IndexModel{
@@ -21,6 +25,8 @@ func EnsureAddressIndexes(
 				{Key: "user_id", Value: 1},
 				{Key: "created_at", Value: -1},
 			},
+			Options: options.Index().
+				SetName("user_addresses_created_at"),
 		},
 
 		// Only one address per user may have is_default=true.

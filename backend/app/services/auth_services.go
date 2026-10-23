@@ -4,6 +4,8 @@ import (
 	"basic-app/apperrors"
 	"basic-app/auth"
 	"basic-app/config"
+	"basic-app/email"
+	"basic-app/utils"
 
 	"basic-app/dto"
 	"basic-app/models"
@@ -24,6 +26,7 @@ type AuthService struct {
 	settingsService        *SettingsService
 	totpService            *TOTPService
 	config                 config.Config
+	emailService           email.Service
 }
 
 func NewAuthService(
@@ -32,6 +35,7 @@ func NewAuthService(
 	settingsService *SettingsService,
 	totpService *TOTPService,
 	cfg config.Config,
+	emailService email.Service,
 ) *AuthService {
 	return &AuthService{
 		userRepository:         userRepository,
@@ -39,6 +43,7 @@ func NewAuthService(
 		settingsService:        settingsService,
 		totpService:            totpService,
 		config:                 cfg,
+		emailService:           emailService,
 	}
 }
 
@@ -156,6 +161,15 @@ func (s *AuthService) RegisterUser(
 		return nil, err
 	}
 
+	// Generate Email Verification Token
+	rawToken, err := utils.GenerateRandomToken(32)
+	if err != nil {
+		return nil, err
+	}
+
+	tokenExpiry := time.Now().UTC().Add(24 * time.Hour)
+	tokenHash := utils.HashToken(rawToken)
+
 	user := models.NewCustomerUser()
 
 	user.FirstName = firstName
@@ -166,9 +180,20 @@ func (s *AuthService) RegisterUser(
 	user.Phone = phone
 	user.PasswordHash = string(passwordHash)
 
+	// Verification Fields
+	user.IsEmailVerified = false
+	user.EmailVerificationToken = tokenHash
+	user.EmailVerificationExpiry = &tokenExpiry
+
 	if err := s.userRepository.Create(ctx, &user); err != nil {
 		return nil, err
 	}
+
+	// Dispatch email asynchronously so HTTP response is not delayed
+	go func(targetEmail, targetName, token string) {
+		// Use your email service/mailer instance
+		_ = s.emailService.SendVerificationEmail(targetEmail, targetName, token)
+	}(user.Email, user.FirstName, rawToken)
 
 	return &user, nil
 }
@@ -600,4 +625,67 @@ func (s *AuthService) getTOTPEncryptionService() (
 	return NewTOTPEncryptionService(
 		s.config.TOTPEncryptionKey,
 	)
+}
+
+func (s *AuthService) VerifyEmail(ctx context.Context, rawToken string) error {
+	if rawToken == "" {
+		return errors.New("verification token is required")
+	}
+
+	hashedToken := utils.HashToken(rawToken)
+
+	// Repository must find a user where email_verification_token == hashedToken
+	user, err := s.userRepository.FindByVerificationToken(ctx, hashedToken)
+	if err != nil {
+		return err // e.g., apperrors.ErrInvalidOrExpiredToken
+	}
+
+	now := time.Now().UTC()
+	if user.EmailVerificationExpiry == nil || now.After(*user.EmailVerificationExpiry) {
+		return errors.New("verification token has expired")
+	}
+
+	user.IsEmailVerified = true
+	user.EmailVerificationToken = ""
+	user.EmailVerificationExpiry = nil
+	user.UpdatedAt = now
+
+	return s.userRepository.Update(ctx, user)
+}
+
+func (s *AuthService) ResendVerificationEmail(ctx context.Context, email string) error {
+	cleanEmail, err := validation.ValidateEmail(email, true)
+	if err != nil {
+		return err
+	}
+
+	user, err := s.userRepository.FindByEmail(ctx, cleanEmail)
+	if err != nil {
+		// Don't leak user existence; return generic nil or handle gracefully
+		return nil
+	}
+
+	if user.IsEmailVerified {
+		return errors.New("email is already verified")
+	}
+
+	rawToken, err := utils.GenerateRandomToken(32)
+	if err != nil {
+		return err
+	}
+
+	tokenExpiry := time.Now().UTC().Add(24 * time.Hour)
+	user.EmailVerificationToken = utils.HashToken(rawToken)
+	user.EmailVerificationExpiry = &tokenExpiry
+	user.UpdatedAt = time.Now().UTC()
+
+	if err := s.userRepository.Update(ctx, user); err != nil {
+		return err
+	}
+
+	go func(targetEmail, targetName, token string) {
+		_ = s.emailService.SendVerificationEmail(targetEmail, targetName, token)
+	}(user.Email, user.FirstName, rawToken)
+
+	return nil
 }

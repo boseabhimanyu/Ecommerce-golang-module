@@ -39,6 +39,10 @@ type User struct {
 	TwoFactorSecret        string   `bson:"two_factor_secret" json:"-"`
 	TwoFactorPendingSecret string   `bson:"two_factor_pending_secret" json:"-"`
 	BackupCodeHashes       []string `bson:"backup_code_hashes" json:"-"`
+
+	IsEmailVerified         bool       `bson:"is_email_verified" json:"isEmailVerified"`
+	EmailVerificationToken  string     `bson:"email_verification_token" json:"-"`
+	EmailVerificationExpiry *time.Time `bson:"email_verification_expiry" json:"-"`
 }
 
 func NewCustomerUser() User {

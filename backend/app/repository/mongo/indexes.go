@@ -60,6 +60,20 @@ func EnsureUserIndexes(
 				).
 				SetName("unique_alt_email"),
 		},
+		{
+			Keys: bson.D{
+				{Key: "email_verification_token", Value: 1},
+			},
+			Options: options.Index().
+				SetPartialFilterExpression(
+					bson.M{
+						"email_verification_token": bson.M{
+							"$gt": "",
+						},
+					},
+				).
+				SetName("idx_email_verification_token"),
+		},
 	}
 
 	_, err := collection.Indexes().CreateMany(ctx, indexes)

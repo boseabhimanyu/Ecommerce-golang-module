@@ -58,4 +58,6 @@ type UserRepository interface {
 		userID string,
 		lastLoginAt time.Time,
 	) error
+	FindByVerificationToken(ctx context.Context, tokenHash string) (*models.User, error)
+	FindByEmail(ctx context.Context, email string) (*models.User, error)
 }

@@ -58,7 +58,8 @@ func (h *AuthHandler) Register(c *gin.Context) {
 			c.JSON(http.StatusConflict, gin.H{
 				"error": err.Error(),
 			})
-
+		case errors.Is(err, apperrors.ErrPhoneAlreadyExists):
+			c.JSON(http.StatusConflict, gin.H{"error": err.Error()})
 		default:
 			c.JSON(http.StatusBadRequest, gin.H{
 				"error": err.Error(),
@@ -69,18 +70,53 @@ func (h *AuthHandler) Register(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusCreated, gin.H{
-		"message": "user registered successfully",
+		"message": "user registered successfully. please check your email to verify your account.",
 		"user": gin.H{
-			"id":        user.ID,
-			"firstName": user.FirstName,
-			"lastName":  user.LastName,
-			"username":  user.Username,
-			"email":     user.Email,
-			"altEmail":  user.AltEmail,
-			"phone":     user.Phone,
-			"role":      user.Role,
-			"status":    user.Status,
+			"id":              user.ID,
+			"firstName":       user.FirstName,
+			"lastName":        user.LastName,
+			"username":        user.Username,
+			"email":           user.Email,
+			"altEmail":        user.AltEmail,
+			"phone":           user.Phone,
+			"role":            user.Role,
+			"status":          user.Status,
+			"isEmailVerified": user.IsEmailVerified,
 		},
+	})
+}
+
+func (h *AuthHandler) VerifyEmail(c *gin.Context) {
+	var req dto.VerifyEmailRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid request body"})
+		return
+	}
+
+	if err := h.authService.VerifyEmail(c.Request.Context(), req.Token); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "email verified successfully",
+	})
+}
+
+func (h *AuthHandler) ResendVerificationEmail(c *gin.Context) {
+	var req dto.ResendVerificationRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid request body"})
+		return
+	}
+
+	if err := h.authService.ResendVerificationEmail(c.Request.Context(), req.Email); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "if an account with that email exists, a verification link has been sent",
 	})
 }
 

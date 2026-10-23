@@ -159,6 +159,11 @@ func (r *UserRepository) Update(
 			"two_factor_pending_secret": user.TwoFactorPendingSecret,
 			"backup_code_hashes":        user.BackupCodeHashes,
 
+			// Email Verification Fields
+			"is_email_verified":         user.IsEmailVerified,
+			"email_verification_token":  user.EmailVerificationToken,
+			"email_verification_expiry": user.EmailVerificationExpiry,
+
 			"updated_at": user.UpdatedAt,
 		},
 	}
@@ -552,4 +557,52 @@ func (r *UserRepository) UpdateLastLoginAt(
 	}
 
 	return nil
+}
+
+func (r *UserRepository) FindByVerificationToken(
+	ctx context.Context,
+	tokenHash string,
+) (*models.User, error) {
+	if tokenHash == "" {
+		return nil, apperrors.ErrInvalidOrExpiredToken
+	}
+
+	filter := bson.M{
+		"email_verification_token": tokenHash,
+	}
+
+	var user models.User
+	err := r.collection.FindOne(ctx, filter).Decode(&user)
+	if err != nil {
+		if errors.Is(err, mongo.ErrNoDocuments) {
+			return nil, apperrors.ErrUserNotFound
+		}
+		return nil, err
+	}
+
+	return &user, nil
+}
+
+func (r *UserRepository) FindByEmail(
+	ctx context.Context,
+	email string,
+) (*models.User, error) {
+	if email == "" {
+		return nil, apperrors.ErrUserNotFound
+	}
+
+	filter := bson.M{
+		"email": email,
+	}
+
+	var user models.User
+	err := r.collection.FindOne(ctx, filter).Decode(&user)
+	if err != nil {
+		if errors.Is(err, mongo.ErrNoDocuments) {
+			return nil, apperrors.ErrUserNotFound
+		}
+		return nil, err
+	}
+
+	return &user, nil
 }

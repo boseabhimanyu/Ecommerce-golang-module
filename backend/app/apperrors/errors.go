@@ -28,6 +28,7 @@ var (
 	ErrUserNotFound                = errors.New("user not found")
 	ErrRegistrationDisabled        = errors.New("user registration is currently disabled by the administrator")
 	ErrApplicationSettingsNotFound = errors.New("application settings not found")
+	ErrInvalidOrExpiredToken       = errors.New("Invalid or expired token")
 
 	// RefreshToken
 	ErrRefreshTokenNotFound = errors.New("refresh token not found")
