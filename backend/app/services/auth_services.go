@@ -6,6 +6,9 @@ import (
 	"basic-app/config"
 	"basic-app/email"
 	"basic-app/utils"
+	"crypto/rand"
+	"crypto/sha256"
+	"encoding/hex"
 
 	"basic-app/dto"
 	"basic-app/models"
@@ -21,12 +24,14 @@ import (
 )
 
 type AuthService struct {
-	userRepository         repository.UserRepository
-	refreshTokenRepository repository.RefreshTokenRepository
-	settingsService        *SettingsService
-	totpService            *TOTPService
-	config                 config.Config
-	emailService           email.Service
+	userRepository          repository.UserRepository
+	refreshTokenRepository  repository.RefreshTokenRepository
+	settingsService         *SettingsService
+	totpService             *TOTPService
+	config                  config.Config
+	emailService            email.Service
+	emailVerificationExpiry time.Duration
+	passwordResetExpiry     time.Duration
 }
 
 func NewAuthService(
@@ -36,14 +41,18 @@ func NewAuthService(
 	totpService *TOTPService,
 	cfg config.Config,
 	emailService email.Service,
+	emailVerificationExpiry time.Duration,
+	passwordResetExpiry time.Duration,
 ) *AuthService {
 	return &AuthService{
-		userRepository:         userRepository,
-		refreshTokenRepository: refreshTokenRepository,
-		settingsService:        settingsService,
-		totpService:            totpService,
-		config:                 cfg,
-		emailService:           emailService,
+		userRepository:          userRepository,
+		refreshTokenRepository:  refreshTokenRepository,
+		settingsService:         settingsService,
+		totpService:             totpService,
+		config:                  cfg,
+		emailService:            emailService,
+		emailVerificationExpiry: emailVerificationExpiry,
+		passwordResetExpiry:     passwordResetExpiry,
 	}
 }
 
@@ -167,7 +176,7 @@ func (s *AuthService) RegisterUser(
 		return nil, err
 	}
 
-	tokenExpiry := time.Now().UTC().Add(24 * time.Hour)
+	tokenExpiry := time.Now().UTC().Add(s.emailVerificationExpiry)
 	tokenHash := utils.HashToken(rawToken)
 
 	user := models.NewCustomerUser()
@@ -674,7 +683,7 @@ func (s *AuthService) ResendVerificationEmail(ctx context.Context, email string)
 		return err
 	}
 
-	tokenExpiry := time.Now().UTC().Add(24 * time.Hour)
+	tokenExpiry := time.Now().UTC().Add(s.emailVerificationExpiry)
 	user.EmailVerificationToken = utils.HashToken(rawToken)
 	user.EmailVerificationExpiry = &tokenExpiry
 	user.UpdatedAt = time.Now().UTC()
@@ -688,4 +697,85 @@ func (s *AuthService) ResendVerificationEmail(ctx context.Context, email string)
 	}(user.Email, user.FirstName, rawToken)
 
 	return nil
+}
+
+func (s *AuthService) ForgotPassword(ctx context.Context, req dto.ForgotPasswordRequest) error {
+	cleanEmail, err := validation.ValidateEmail(req.Email, true)
+	if err != nil {
+		return err
+	}
+
+	user, err := s.userRepository.FindByEmail(ctx, cleanEmail)
+	if err != nil {
+		// Prevent user enumeration: do not leak whether the email exists
+		return nil
+	}
+
+	// Generate a secure random 32-byte hex token
+	rawTokenBytes := make([]byte, 32)
+	if _, err := rand.Read(rawTokenBytes); err != nil {
+		return err
+	}
+	rawToken := hex.EncodeToString(rawTokenBytes)
+
+	// Hash the token before storing in MongoDB
+	tokenHash := hashToken(rawToken) // using sha256.Sum256([]byte(rawToken))
+
+	// Replace: time.Now().UTC().Add(1 * time.Hour)
+	expiry := time.Now().UTC().Add(s.passwordResetExpiry)
+	user.PasswordResetExpiry = &expiry
+
+	user.PasswordResetToken = tokenHash
+	user.PasswordResetExpiry = &expiry
+
+	if err := s.userRepository.Update(ctx, user); err != nil {
+		return err
+	}
+
+	// Dispatch email asynchronously
+	go func() {
+		_ = s.emailService.SendPasswordResetEmail(user.Email, user.FirstName, rawToken)
+	}()
+
+	return nil
+}
+
+func (s *AuthService) ResetPassword(ctx context.Context, req dto.ResetPasswordRequest) error {
+	rawToken := strings.TrimSpace(req.Token)
+	if rawToken == "" {
+		return apperrors.ErrInvalidOrExpiredToken
+	}
+
+	if err := validation.ValidatePassword(req.NewPassword); err != nil {
+		return err
+	}
+	tokenHash := hashToken(rawToken)
+
+	user, err := s.userRepository.FindByPasswordResetToken(ctx, tokenHash)
+	if err != nil {
+		return apperrors.ErrInvalidOrExpiredToken
+	}
+
+	// Verify expiration
+	if user.PasswordResetExpiry == nil || time.Now().UTC().After(*user.PasswordResetExpiry) {
+		return apperrors.ErrInvalidOrExpiredToken
+	}
+
+	// Hash new password using bcrypt
+	newHash, err := bcrypt.GenerateFromPassword([]byte(req.NewPassword), bcrypt.DefaultCost)
+	if err != nil {
+		return err
+	}
+
+	// Update user password and clear reset token
+	user.PasswordHash = string(newHash)
+	user.PasswordResetToken = ""
+	user.PasswordResetExpiry = nil
+
+	return s.userRepository.Update(ctx, user)
+}
+
+func hashToken(token string) string {
+	hash := sha256.Sum256([]byte(token))
+	return hex.EncodeToString(hash[:])
 }

@@ -77,12 +77,16 @@ func NewRouter(
 	// Dependencies
 	// ------------------------------------------------------------------
 
+	var emailService email.Service
+
 	frontendURL := "http://localhost:3000"
 	if len(cfg.AllowedOrigins) > 0 && cfg.AllowedOrigins[0] != "" {
 		frontendURL = cfg.AllowedOrigins[0]
 	}
 
-	emailService := email.NewLoggerEmailService(frontendURL)
+	emailCfg := config.LoadEmailConfig(frontendURL)
+	emailService = emailCfg.InitEmailService()
+
 	userRepository := mongorepo.NewUserRepository(database)
 
 	settingsRepository := mongorepo.NewApplicationSettingsRepository(database)
@@ -97,6 +101,8 @@ func NewRouter(
 		totpService,
 		cfg,
 		emailService,
+		emailCfg.EmailVerificationExpiry,
+		emailCfg.PasswordResetExpiry,
 	)
 
 	// Initialize application settings.
@@ -261,9 +267,13 @@ func NewRouter(
 			twoFactorLimiter.Middleware(middleware.RateLimitKeyByIP),
 			authHandler.VerifyTwoFactorLogin,
 		)
-
+		// Email verification
 		authRoutes.POST("/verify-email", authHandler.VerifyEmail)
 		authRoutes.POST("/resend-verification", authHandler.ResendVerificationEmail)
+
+		// Password Reset
+		authRoutes.POST("/forgot-password", authHandler.ForgotPassword)
+		authRoutes.POST("/reset-password", authHandler.ResetPassword)
 
 		// Authenticated
 		protected := authRoutes.Group("")

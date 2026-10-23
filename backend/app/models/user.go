@@ -43,6 +43,8 @@ type User struct {
 	IsEmailVerified         bool       `bson:"is_email_verified" json:"isEmailVerified"`
 	EmailVerificationToken  string     `bson:"email_verification_token" json:"-"`
 	EmailVerificationExpiry *time.Time `bson:"email_verification_expiry" json:"-"`
+	PasswordResetToken      string     `bson:"password_reset_token" json:"-"`
+	PasswordResetExpiry     *time.Time `bson:"password_reset_expiry" json:"-"`
 }
 
 func NewCustomerUser() User {

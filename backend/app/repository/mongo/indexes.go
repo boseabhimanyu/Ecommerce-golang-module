@@ -74,6 +74,20 @@ func EnsureUserIndexes(
 				).
 				SetName("idx_email_verification_token"),
 		},
+		{
+			Keys: bson.D{
+				{Key: "password_reset_token", Value: 1},
+			},
+			Options: options.Index().
+				SetPartialFilterExpression(
+					bson.M{
+						"password_reset_token": bson.M{
+							"$gt": "",
+						},
+					},
+				).
+				SetName("idx_password_reset_token"),
+		},
 	}
 
 	_, err := collection.Indexes().CreateMany(ctx, indexes)

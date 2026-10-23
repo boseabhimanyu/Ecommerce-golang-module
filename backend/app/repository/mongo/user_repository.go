@@ -164,6 +164,10 @@ func (r *UserRepository) Update(
 			"email_verification_token":  user.EmailVerificationToken,
 			"email_verification_expiry": user.EmailVerificationExpiry,
 
+			"password_hash":         user.PasswordHash,
+			"password_reset_token":  user.PasswordResetToken,
+			"password_reset_expiry": user.PasswordResetExpiry,
+
 			"updated_at": user.UpdatedAt,
 		},
 	}
@@ -600,6 +604,30 @@ func (r *UserRepository) FindByEmail(
 	if err != nil {
 		if errors.Is(err, mongo.ErrNoDocuments) {
 			return nil, apperrors.ErrUserNotFound
+		}
+		return nil, err
+	}
+
+	return &user, nil
+}
+
+func (r *UserRepository) FindByPasswordResetToken(
+	ctx context.Context,
+	tokenHash string,
+) (*models.User, error) {
+	if tokenHash == "" {
+		return nil, apperrors.ErrInvalidOrExpiredToken
+	}
+
+	filter := bson.M{
+		"password_reset_token": tokenHash,
+	}
+
+	var user models.User
+	err := r.collection.FindOne(ctx, filter).Decode(&user)
+	if err != nil {
+		if errors.Is(err, mongo.ErrNoDocuments) {
+			return nil, apperrors.ErrInvalidOrExpiredToken
 		}
 		return nil, err
 	}

@@ -60,4 +60,5 @@ type UserRepository interface {
 	) error
 	FindByVerificationToken(ctx context.Context, tokenHash string) (*models.User, error)
 	FindByEmail(ctx context.Context, email string) (*models.User, error)
+	FindByPasswordResetToken(ctx context.Context, tokenHash string) (*models.User, error)
 }
