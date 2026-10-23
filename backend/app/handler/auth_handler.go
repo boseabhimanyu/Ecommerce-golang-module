@@ -732,6 +732,20 @@ func (h *AuthHandler) AdminResetTwoFactor(c *gin.Context) {
 }
 
 func (h *AuthHandler) ForgotPassword(c *gin.Context) {
+	// Direct check: if access_token or refresh_token cookie exists, reject immediately
+	if _, err := c.Cookie(h.config.AuthAccessCookie); err == nil {
+		c.JSON(http.StatusForbidden, gin.H{
+			"error": "logged-in users cannot request password reset",
+		})
+		return
+	}
+	if _, err := c.Cookie(h.config.AuthRefreshCookie); err == nil {
+		c.JSON(http.StatusForbidden, gin.H{
+			"error": "logged-in users cannot request password reset",
+		})
+		return
+	}
+
 	var req dto.ForgotPasswordRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid request body"})
@@ -749,6 +763,19 @@ func (h *AuthHandler) ForgotPassword(c *gin.Context) {
 }
 
 func (h *AuthHandler) ResetPassword(c *gin.Context) {
+	if _, err := c.Cookie(h.config.AuthAccessCookie); err == nil {
+		c.JSON(http.StatusForbidden, gin.H{
+			"error": "logged-in users cannot request password reset",
+		})
+		return
+	}
+	if _, err := c.Cookie(h.config.AuthRefreshCookie); err == nil {
+		c.JSON(http.StatusForbidden, gin.H{
+			"error": "logged-in users cannot request password reset",
+		})
+		return
+	}
+
 	var req dto.ResetPasswordRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid request body"})
