@@ -1,6 +1,7 @@
 import Link from "next/link";
 import api from "@/lib/api";
 import type { Metadata } from "next";
+import BackupCodesWarning from "@/components/dashboard/backup-codes-warning";
 
 
 export const metadata: Metadata = {
@@ -85,6 +86,7 @@ export default async function Home() {
       {/* 4. Navbar: Application branding and authentication actions */}
       <header className="border-b border-gray-200 bg-white">
         <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-6 py-4">
+          
           <Link href="/" className="text-xl font-bold tracking-tight">
             Go Admin Starter
           </Link>
@@ -105,7 +107,9 @@ export default async function Home() {
           </nav>
         </div>
       </header>
-
+          <div className="mt-6">
+                    <BackupCodesWarning />
+                  </div>  
       <div className="mx-auto max-w-6xl space-y-12 px-6 py-10">
 
         {/* 5. Hero: Introduce the full-stack boilerplate */}
