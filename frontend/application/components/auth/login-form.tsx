@@ -93,11 +93,11 @@ const shouldShow =
   }
 
   if (challengeToken) {
-    return 
-    <TwoFactorForm
-     challengeToken={challengeToken} 
-     />;
-
+    return (
+      <TwoFactorForm
+        challengeToken={challengeToken}
+      />
+    );
   }
 
   return (

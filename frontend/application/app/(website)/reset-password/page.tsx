@@ -236,35 +236,26 @@ function ResetPasswordContent() {
             </div>
 
             {requires2FA && (
-              <div className="flex flex-col gap-3 rounded-2xl border border-blue-200/80 bg-blue-50/50 p-4 backdrop-blur-xl">
-                <div className="flex items-center justify-between">
-                  <label htmlFor="twoFactorCode" className="text-xs font-semibold uppercase tracking-wider text-blue-900">
-                    {useBackupCode ? "Backup Code" : "2FA Security Code"}
-                  </label>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setUseBackupCode(!useBackupCode);
-                      setTwoFactorCode("");
-                    }}
-                    className="text-xs text-blue-700 underline underline-offset-2 hover:text-blue-950"
-                  >
-                    {useBackupCode ? "Use Authenticator App" : "Use Backup Code"}
-                  </button>
-                </div>
+  <div className="flex flex-col gap-2 rounded-2xl border border-blue-200/80 bg-blue-50/50 p-4 backdrop-blur-xl">
+    <label
+      htmlFor="twoFactorCode"
+      className="text-xs font-semibold uppercase tracking-wider text-blue-900"
+    >
+      2FA Security Code
+    </label>
 
-                <input
-                  id="twoFactorCode"
-                  type="text"
-                  value={twoFactorCode}
-                  onChange={(e) => setTwoFactorCode(e.target.value)}
-                  placeholder={useBackupCode ? "e.g. a1b2c3d4" : "6-digit code"}
-                  autoFocus
-                  required
-                  className="h-11 rounded-xl border border-white/90 bg-white/80 px-4 text-sm font-mono tracking-widest text-zinc-900 outline-none backdrop-blur-xl transition hover:bg-white focus:border-blue-400 focus:ring-2 focus:ring-blue-200/60"
-                />
-              </div>
-            )}
+    <input
+      id="twoFactorCode"
+      type="text"
+      value={twoFactorCode}
+      onChange={(e) => setTwoFactorCode(e.target.value)}
+      placeholder="Enter 6-digit code or backup code"
+      autoFocus
+      required
+      className="h-11 rounded-xl border border-white/90 bg-white/80 px-4 text-sm font-mono tracking-widest text-zinc-900 outline-none backdrop-blur-xl transition hover:bg-white focus:border-blue-400 focus:ring-2 focus:ring-blue-200/60"
+    />
+  </div>
+)}
 
             {error && (
               <div
