@@ -5,6 +5,7 @@ import {
   ChangeEvent,
   FormEvent,
   useState,
+  useEffect,
 } from "react";
 
 import api from "@/lib/api";
@@ -38,25 +39,21 @@ function formatDateForInput(value?: string | null) {
     return "";
   }
 
-  // ISO date/timestamp: 1985-08-15T00:00:00Z
   const isoMatch = value.match(
     /^(\d{4})-(\d{2})-(\d{2})T/,
   );
 
   if (isoMatch) {
     const [, year, month, day] = isoMatch;
-
     return `${year}-${month}-${day}`;
   }
 
-  // DD-MM-YYYY: 15-08-1985
   const dmyMatch = value.match(
     /^(\d{2})-(\d{2})-(\d{4})$/,
   );
 
   if (dmyMatch) {
     const [, day, month, year] = dmyMatch;
-
     return `${year}-${month}-${day}`;
   }
 
@@ -68,93 +65,94 @@ export default function ProfileFormRoot({
 }: ProfileFormProps) {
   const { showNotification } = useNotification();
 
-  const [firstName, setFirstName] = useState(
-    user.firstName ?? "",
-  );
-
-  const [lastName, setLastName] = useState(
-    user.lastName ?? "",
-  );
-
-  const [username, setUsername] = useState(
-    user.username ?? "",
-  );
-
-  const [email, setEmail] = useState(
-    user.email ?? "",
-  );
-
-  const [phone, setPhone] = useState(
-    user.phone ?? "",
-  );
-
+  const [firstName, setFirstName] = useState(user.firstName ?? "");
+  const [lastName, setLastName] = useState(user.lastName ?? "");
+  const [username, setUsername] = useState(user.username ?? "");
+  const [email, setEmail] = useState(user.email ?? "");
+  const [phone, setPhone] = useState(user.phone ?? "");
   const [dateOfBirth, setDateOfBirth] = useState(
     formatDateForInput(user.dateOfBirth),
   );
 
-  const [addressLine1, setAddressLine1] = useState(
-    user.addressLine1 ?? "",
-  );
+  const [addressLine1, setAddressLine1] = useState(user.addressLine1 ?? "");
+  const [addressLine2, setAddressLine2] = useState(user.addressLine2 ?? "");
+  const [city, setCity] = useState(user.city ?? "");
+  const [state, setState] = useState(user.state ?? "");
+  const [pinCode, setPinCode] = useState(user.pinCode ?? "");
 
-  const [addressLine2, setAddressLine2] = useState(
-    user.addressLine2 ?? "",
-  );
-
-  const [city, setCity] = useState(
-    user.city ?? "",
-  );
-
-  const [state, setState] = useState(
-    user.state ?? "",
-  );
-
-  const [pinCode, setPinCode] = useState(
-    user.pinCode ?? "",
-  );
-
-  const [profilePic, setProfilePic] = useState(
-    user.profilePic ?? "",
-  );
-
-  const [profileImageLoading, setProfileImageLoading] =
-    useState(false);
-
-  const [showProfileImage, setShowProfileImage] =
-    useState(false);
-
+  const [profilePic, setProfilePic] = useState(user.profilePic ?? "");
+  const [profileImageLoading, setProfileImageLoading] = useState(false);
+  const [showProfileImage, setShowProfileImage] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  async function handleSubmit(
-    event: FormEvent<HTMLFormElement>,
-  ) {
-    event.preventDefault();
+  // Verification & resend cooldown state
+  const [resendingEmail, setResendingEmail] = useState(false);
+  const [resendCooldown, setResendCooldown] = useState(0);
 
-    setLoading(true);
+  useEffect(() => {
+    if (resendCooldown <= 0) return;
+
+    const timer = setInterval(() => {
+      setResendCooldown((prev) => prev - 1);
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [resendCooldown]);
+
+  async function handleResendVerification() {
+    if (resendingEmail || resendCooldown > 0) return;
+
+    setResendingEmail(true);
 
     try {
-      const apiDateOfBirth =
-        formatDateForApi(dateOfBirth);
-
-      const response = await api.patch(
-        "/auth/me",
-        {
-          firstName: firstName.trim(),
-          lastName: lastName.trim(),
-          username: username.trim(),
-          email: email.trim(),
-          phone: phone.trim(),
-          dateOfBirth: apiDateOfBirth,
-          addressLine1: addressLine1.trim(),
-          addressLine2: addressLine2.trim(),
-          city: city.trim(),
-          state: state.trim(),
-          pinCode: pinCode.trim(),
-        },
-      );
+      const response = await api.post("/auth/resend-verification");
 
       showNotification(
         response.data?.message ??
-          "Profile updated successfully.",
+          "Verification email sent. Please check your inbox.",
+        "success",
+      );
+
+      setResendCooldown(60);
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        showNotification(
+          error.response?.data?.message ??
+            error.response?.data?.error ??
+            "Unable to resend verification email.",
+          "error",
+        );
+      } else {
+        showNotification("Unable to connect to the server.", "error");
+      }
+    } finally {
+      setResendingEmail(false);
+    }
+  }
+
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setLoading(true);
+
+    try {
+      const apiDateOfBirth = formatDateForApi(dateOfBirth);
+
+      const response = await api.patch("/auth/me", {
+        firstName: firstName.trim(),
+        lastName: lastName.trim(),
+        username: username.trim(),
+        email: email.trim(),
+        phone: phone.trim(),
+        dateOfBirth: apiDateOfBirth,
+        addressLine1: addressLine1.trim(),
+        addressLine2: addressLine2.trim(),
+        city: city.trim(),
+        state: state.trim(),
+        pinCode: pinCode.trim(),
+      });
+
+      showNotification(
+        response.data?.message ?? "Profile updated successfully.",
         "success",
       );
     } catch (error) {
@@ -166,10 +164,7 @@ export default function ProfileFormRoot({
           "error",
         );
       } else {
-        showNotification(
-          "Unable to connect to the server.",
-          "error",
-        );
+        showNotification("Unable to connect to the server.", "error");
       }
     } finally {
       setLoading(false);
@@ -180,30 +175,21 @@ export default function ProfileFormRoot({
     event: ChangeEvent<HTMLInputElement>,
   ) {
     const file = event.target.files?.[0];
-
-    if (!file) {
-      return;
-    }
+    if (!file) return;
 
     const formData = new FormData();
-
     formData.append("profile_pic", file);
 
     setProfileImageLoading(true);
 
     try {
-      const response = await api.patch(
-        "/auth/me/image",
-        formData,
-      );
+      const response = await api.patch("/auth/me/image", formData);
 
       showNotification(
-        response.data?.message ??
-          "Profile picture updated successfully.",
+        response.data?.message ?? "Profile picture updated successfully.",
         "success",
       );
 
-      // Refresh to load the newly saved profile picture.
       window.location.reload();
     } catch (error) {
       if (axios.isAxiosError(error)) {
@@ -214,15 +200,10 @@ export default function ProfileFormRoot({
           "error",
         );
       } else {
-        showNotification(
-          "Unable to connect to the server.",
-          "error",
-        );
+        showNotification("Unable to connect to the server.", "error");
       }
     } finally {
       setProfileImageLoading(false);
-
-      // Allow selecting the same file again.
       event.target.value = "";
     }
   }
@@ -238,17 +219,13 @@ export default function ProfileFormRoot({
     <>
       <form
         onSubmit={handleSubmit}
-        className="rounded-3xl border] p-4 
-        shadow-[0_8px_30px_rgba(23,60,121,0.08)] 
-        backdrop-blur-2xl sm:p-5 lg:p-6"
+        className="rounded-3xl border p-4 shadow-[0_8px_30px_rgba(23,60,121,0.08)] backdrop-blur-2xl sm:p-5 lg:p-6"
         style={{
-        //   backgroundColor: "var(--menu-glass)",
           borderColor: "var(--menu-glass-border)",
           color: "var(--menu-text)",
         }}
       >
         {/* Profile Picture */}
-
         <section className="mb-6">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
             <div
@@ -260,9 +237,7 @@ export default function ProfileFormRoot({
               {profilePic ? (
                 <button
                   type="button"
-                  onClick={() =>
-                    setShowProfileImage(true)
-                  }
+                  onClick={() => setShowProfileImage(true)}
                   className="block h-full w-full cursor-zoom-in"
                   aria-label="View profile picture"
                 >
@@ -302,9 +277,7 @@ export default function ProfileFormRoot({
               <label
                 htmlFor="profile-picture"
                 className={`mt-3 inline-flex cursor-pointer items-center rounded-xl border px-4 py-2.5 text-sm font-medium shadow-sm transition-colors hover:brightness-95 ${
-                  profileImageLoading
-                    ? "pointer-events-none opacity-60"
-                    : ""
+                  profileImageLoading ? "pointer-events-none opacity-60" : ""
                 }`}
                 style={{
                   backgroundColor: "var(--menu-glass)",
@@ -312,9 +285,7 @@ export default function ProfileFormRoot({
                   color: "var(--menu-text)",
                 }}
               >
-                {profileImageLoading
-                  ? "Uploading..."
-                  : "Change photo"}
+                {profileImageLoading ? "Uploading..." : "Change photo"}
               </label>
 
               <input
@@ -337,7 +308,6 @@ export default function ProfileFormRoot({
         />
 
         {/* Personal Information */}
-
         <section>
           <div className="mb-5">
             <h2
@@ -356,9 +326,7 @@ export default function ProfileFormRoot({
               label="First name"
               value={firstName}
               autoComplete="given-name"
-              onChange={(event) =>
-                setFirstName(event.target.value)
-              }
+              onChange={(event) => setFirstName(event.target.value)}
             />
 
             <ProfileField
@@ -366,9 +334,7 @@ export default function ProfileFormRoot({
               label="Last name"
               value={lastName}
               autoComplete="family-name"
-              onChange={(event) =>
-                setLastName(event.target.value)
-              }
+              onChange={(event) => setLastName(event.target.value)}
             />
 
             <ProfileField
@@ -376,9 +342,7 @@ export default function ProfileFormRoot({
               label="Username"
               value={username}
               autoComplete="username"
-              onChange={(event) =>
-                setUsername(event.target.value)
-              }
+              onChange={(event) => setUsername(event.target.value)}
             />
 
             <ProfileField
@@ -388,38 +352,81 @@ export default function ProfileFormRoot({
               value={phone}
               autoComplete="tel"
               inputMode="tel"
-              onChange={(event) =>
-                setPhone(event.target.value)
-              }
+              onChange={(event) => setPhone(event.target.value)}
             />
 
-            <ProfileField
-              id="email"
-              label="Email"
-              type="email"
-              value={email}
-              autoComplete="email"
-              inputMode="email"
-              onChange={(event) =>
-                setEmail(event.target.value)
-              }
-            />
+            {/* Email Field with inline verification badge & resend action */}
+            <div className="flex flex-col gap-1.5">
+              <div className="flex items-center justify-between gap-1">
+                <div className="flex items-center gap-2">
+                  <label
+                    htmlFor="email"
+                    className="text-sm font-medium"
+                    style={{
+                      color: "var(--menu-text)",
+                    }}
+                  >
+                    Email
+                  </label>
 
+                  {user.isEmailVerified ? (
+                    <span className="inline-flex items-center gap-1 rounded-full border border-emerald-300/80 bg-emerald-50/70 px-2 py-0.5 text-[11px] font-medium text-emerald-800">
+                      <span className="h-1.5 w-1.5 rounded-full bg-emerald-600" />
+                      Verified
+                    </span>
+                  ) : (
+                    <span className="inline-flex items-center gap-1 rounded-full border border-red-300/80 bg-red-50/70 px-2 py-0.5 text-[11px] font-medium text-red-700">
+                      <span className="h-1.5 w-1.5 rounded-full bg-red-600" />
+                      Not verified
+                    </span>
+                  )}
+                </div>
 
+                {!user.isEmailVerified && (
+                  <button
+                    type="button"
+                    onClick={handleResendVerification}
+                    disabled={resendingEmail || resendCooldown > 0}
+                    className="text-xs font-medium text-blue-600 underline-offset-4 hover:underline disabled:cursor-not-allowed disabled:text-zinc-400 disabled:no-underline"
+                  >
+                    {resendingEmail
+                      ? "Sending..."
+                      : resendCooldown > 0
+                        ? `${resendCooldown}s`
+                        : "Resend Verification Email"}
+                  </button>
+                )}
+              </div>
+
+              <input
+                id="email"
+                name="email"
+                type="email"
+                value={email}
+                autoComplete="email"
+                inputMode="email"
+                onChange={(event) => setEmail(event.target.value)}
+                className="h-11 rounded-xl border px-4 text-sm shadow-[0_4px_14px_rgba(23,60,121,0.07)] outline-none backdrop-blur-xl transition hover:bg-white/70 focus:border-blue-300 focus:bg-white/80 focus:ring-2 focus:ring-blue-200"
+                style={{
+                  backgroundColor: "var(--menu-glass)",
+                  borderColor: "var(--menu-glass-border)",
+                  color: "var(--menu-text)",
+                }}
+              />
+            </div>
+
+            {/* Date of Birth stays in the same 2-col row */}
             <ProfileField
               id="dateOfBirth"
               label="Date of birth"
               type="date"
               value={dateOfBirth}
-              onChange={(event) =>
-                setDateOfBirth(event.target.value)
-              }
+              onChange={(event) => setDateOfBirth(event.target.value)}
             />
           </div>
         </section>
 
         {/* Address Divider */}
-
         <div
           className="my-6 h-px"
           style={{
@@ -428,7 +435,6 @@ export default function ProfileFormRoot({
         />
 
         {/* Address */}
-
         <section>
           <div className="mb-5">
             <h2
@@ -448,9 +454,7 @@ export default function ProfileFormRoot({
                 label="Address line 1"
                 value={addressLine1}
                 autoComplete="address-line1"
-                onChange={(event) =>
-                  setAddressLine1(event.target.value)
-                }
+                onChange={(event) => setAddressLine1(event.target.value)}
               />
             </div>
 
@@ -460,9 +464,7 @@ export default function ProfileFormRoot({
                 label="Address line 2"
                 value={addressLine2}
                 autoComplete="address-line2"
-                onChange={(event) =>
-                  setAddressLine2(event.target.value)
-                }
+                onChange={(event) => setAddressLine2(event.target.value)}
               />
             </div>
 
@@ -471,9 +473,7 @@ export default function ProfileFormRoot({
               label="City"
               value={city}
               autoComplete="address-level2"
-              onChange={(event) =>
-                setCity(event.target.value)
-              }
+              onChange={(event) => setCity(event.target.value)}
             />
 
             <ProfileField
@@ -481,9 +481,7 @@ export default function ProfileFormRoot({
               label="State"
               value={state}
               autoComplete="address-level1"
-              onChange={(event) =>
-                setState(event.target.value)
-              }
+              onChange={(event) => setState(event.target.value)}
             />
 
             <ProfileField
@@ -492,15 +490,12 @@ export default function ProfileFormRoot({
               value={pinCode}
               autoComplete="postal-code"
               inputMode="numeric"
-              onChange={(event) =>
-                setPinCode(event.target.value)
-              }
+              onChange={(event) => setPinCode(event.target.value)}
             />
           </div>
         </section>
 
         {/* Actions */}
-
         <div className="mt-6 flex justify-end">
           <button
             type="submit"
@@ -510,23 +505,18 @@ export default function ProfileFormRoot({
               backgroundColor: "var(--menu-blue)",
             }}
           >
-            {loading
-              ? "Saving..."
-              : "Save changes"}
+            {loading ? "Saving..." : "Save changes"}
           </button>
         </div>
       </form>
 
       {/* Profile Image Preview */}
-
       {showProfileImage && profilePic && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4 backdrop-blur-sm">
           <button
             type="button"
             aria-label="Close profile picture"
-            onClick={() =>
-              setShowProfileImage(false)
-            }
+            onClick={() => setShowProfileImage(false)}
             className="absolute inset-0 cursor-default"
           />
 
@@ -539,9 +529,7 @@ export default function ProfileFormRoot({
           >
             <button
               type="button"
-              onClick={() =>
-                setShowProfileImage(false)
-              }
+              onClick={() => setShowProfileImage(false)}
               aria-label="Close"
               className="absolute right-3 top-3 z-10 flex h-9 w-9 items-center justify-center rounded-full border bg-white/80 text-lg shadow-sm backdrop-blur-xl transition hover:bg-white"
               style={{
@@ -579,9 +567,7 @@ type ProfileFieldProps = {
     | "numeric"
     | "decimal"
     | "search";
-  onChange: (
-    event: ChangeEvent<HTMLInputElement>,
-  ) => void;
+  onChange: (event: ChangeEvent<HTMLInputElement>) => void;
 };
 
 function ProfileField({

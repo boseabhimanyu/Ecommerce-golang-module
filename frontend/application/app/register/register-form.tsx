@@ -13,42 +13,42 @@ export default function RegisterForm() {
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
-const [confirmPassword, setConfirmPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
   const router = useRouter();
-   const passwordConfirmationState =
-  confirmPassword.length === 0
-    ? "empty"
-    : password === confirmPassword
-      ? "match"
-      : "mismatch";
+  const passwordConfirmationState =
+    confirmPassword.length === 0
+      ? "empty"
+      : password === confirmPassword
+        ? "match"
+        : "mismatch";
   async function handleSubmit(
-  event: FormEvent<HTMLFormElement>,
-) {
-  event.preventDefault();
+    event: FormEvent<HTMLFormElement>,
+  ) {
+    event.preventDefault();
 
-  setError("");
-  setLoading(true);
+    setError("");
+    setLoading(true);
 
-  if (password !== confirmPassword) {
-    setError("Passwords do not match");
-    setLoading(false);
-    return;
-  }
+    if (password !== confirmPassword) {
+      setError("Passwords do not match");
+      setLoading(false);
+      return;
+    }
 
-  try {
-    await api.post("/auth/register", {
-      firstName: firstName.trim(),
-      lastName: lastName.trim(),
-      username: username.trim(),
-      email: email.trim(),
-      phone: phone.trim(),
-      password,
-    });
+    try {
+      await api.post("/auth/register", {
+        firstName: firstName.trim(),
+        lastName: lastName.trim(),
+        username: username.trim(),
+        email: email.trim(),
+        phone: phone.trim(),
+        password,
+      });
 
-    router.push("/login");
+      router.push("/login?registered=true");
     } catch (error) {
       if (axios.isAxiosError(error)) {
         setError(
@@ -69,9 +69,9 @@ const [confirmPassword, setConfirmPassword] = useState("");
         <div className="mb-8">
           <div className="mb-6 flex h-11 w-11 items-center justify-center rounded-2xl bg-black text-sm font-semibold text-white shadow-lg">
             <Link 
-  href="/" >
-  A
-</Link>
+            href="/" >
+              A
+              </Link>
           </div>
 
           <h1 className="text-3xl font-semibold tracking-tight">
@@ -88,44 +88,44 @@ const [confirmPassword, setConfirmPassword] = useState("");
           className="flex flex-col gap-5"
         >
           <div className="grid gap-5 sm:grid-cols-2">
-           <Field
-  id="firstName"
-  label="First name"
-  value={firstName}
-  onChange={setFirstName}
-  autoComplete="given-name"
-  required
-/>
+            <Field
+              id="firstName"
+              label="First name"
+              value={firstName}
+              onChange={setFirstName}
+              autoComplete="given-name"
+              required
+            />
 
             <Field
-  id="lastName"
-  label="Last name"
-  value={lastName}
-  onChange={setLastName}
-  autoComplete="family-name"
-  required
-/>
+              id="lastName"
+              label="Last name"
+              value={lastName}
+              onChange={setLastName}
+              autoComplete="family-name"
+              required
+            />
           </div>
 
           <Field
-  id="username"
-  label="Username"
-  value={username}
-  onChange={setUsername}
-  autoComplete="username"
-  required
-/>
+            id="username"
+            label="Username"
+            value={username}
+            onChange={setUsername}
+            autoComplete="username"
+            required
+          />
 
           <div className="grid gap-5 sm:grid-cols-2">
-           <Field
-  id="email"
-  label="Email"
-  type="email"
-  value={email}
-  onChange={setEmail}
-  autoComplete="email"
-  required
-/>
+            <Field
+              id="email"
+              label="Email"
+              type="email"
+              value={email}
+              onChange={setEmail}
+              autoComplete="email"
+              required
+            />
 
           </div>
 
@@ -136,29 +136,29 @@ const [confirmPassword, setConfirmPassword] = useState("");
             value={phone}
             onChange={setPhone}
             autoComplete="tel"
-             required
+            required
           />
 
-<Field
-  id="password"
-  label="Password"
-  type="password"
-  value={password}
-  onChange={setPassword}
-  autoComplete="new-password"
-  required
-/>
+          <Field
+            id="password"
+            label="Password"
+            type="password"
+            value={password}
+            onChange={setPassword}
+            autoComplete="new-password"
+            required
+          />
 
-<Field
-  id="confirmPassword"
-  label="Confirm password"
-  type="password"
-  value={confirmPassword}
-  onChange={setConfirmPassword}
-  autoComplete="new-password"
-  required
-  passwordMatchState={passwordConfirmationState}
-/>
+          <Field
+            id="confirmPassword"
+            label="Confirm password"
+            type="password"
+            value={confirmPassword}
+            onChange={setConfirmPassword}
+            autoComplete="new-password"
+            required
+            passwordMatchState={passwordConfirmationState}
+          />
           {error && (
             <div
               role="alert"

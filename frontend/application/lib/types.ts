@@ -18,6 +18,7 @@ export type User = {
   state: string;
   pinCode: string;
   twoFactorEnabled: boolean;
+  isEmailVerified: boolean;
 };
 
 export type PageVisibility = "public" | "registered";

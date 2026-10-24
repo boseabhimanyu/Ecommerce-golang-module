@@ -3,12 +3,15 @@
 import axios from "axios";
 import { FormEvent, useState } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
+import { useEffect } from "react";
 
 import api from "@/lib/api";
 import TwoFactorForm from "./two-factor-form";
 
 interface LoginFormProps {
   loginHint: string;
+  registeredSuccess?: boolean;
 }
 
 type LoginResponse = {
@@ -21,14 +24,31 @@ type LoginResponse = {
 
 export default function LoginForm({
   loginHint,
+  registeredSuccess,
 }: LoginFormProps) {
+  const searchParams = useSearchParams();
+const shouldShow =
+    registeredSuccess ?? searchParams.get("registered") === "true";
+
+  // Manage banner visibility in state
+  const [showNotice, setShowNotice] = useState(shouldShow);
+
+  // Auto-dismiss after 10 seconds
+  useEffect(() => {
+    if (!showNotice) return;
+
+    const timer = setTimeout(() => {
+      setShowNotice(false);
+    }, 10000); // 10 seconds
+
+    return () => clearTimeout(timer);
+  }, [showNotice]);
+
   const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
   const [challengeToken, setChallengeToken] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-
-
 
   async function handleSubmit(
     event: FormEvent<HTMLFormElement>,
@@ -39,7 +59,7 @@ export default function LoginForm({
     setLoading(true);
 
     try {
-      const response = await api.post("/auth/login", {
+      const response = await api.post<LoginResponse>("/auth/login", {
         identifier,
         password,
       });
@@ -47,25 +67,23 @@ export default function LoginForm({
       const data = response.data;
 
       if (data.twoFactorRequired === true) {
-        setChallengeToken(data.challengeToken);
+        setChallengeToken(data.challengeToken || "");
         return;
       }
 
-      if (response.data.backupCodesLow) {
-  sessionStorage.setItem(
-    "backupCodesLow",
-    JSON.stringify({
-      remaining: response.data.backupCodesRemaining,
-    }),
-  );
-}
+      if (data.backupCodesLow) {
+        sessionStorage.setItem(
+          "backupCodesLow",
+          JSON.stringify({
+            remaining: data.backupCodesRemaining,
+          }),
+        );
+      }
 
       window.location.href = "/";
-    } catch (error) {
-      if (axios.isAxiosError(error)) {
-        setError(
-          error.response?.data?.error ?? "Login failed",
-        );
+    } catch (err) {
+      if (axios.isAxiosError(err)) {
+        setError(err.response?.data?.error ?? "Login failed");
       } else {
         setError("Unable to connect to the server");
       }
@@ -75,11 +93,11 @@ export default function LoginForm({
   }
 
   if (challengeToken) {
-    return (
-      <TwoFactorForm
-        challengeToken={challengeToken}
-      />
-    );
+    return 
+    <TwoFactorForm
+     challengeToken={challengeToken} 
+     />;
+
   }
 
   return (
@@ -87,10 +105,7 @@ export default function LoginForm({
       <div className="glass w-full max-w-md rounded-3xl p-6 sm:p-8">
         <div className="mb-8">
           <div className="mb-6 flex h-11 w-11 items-center justify-center rounded-2xl bg-black text-sm font-semibold text-white shadow-lg">
-            <Link 
-  href="/" >
-  A
-</Link>
+            <Link href="/">A</Link>
           </div>
 
           <h1 className="text-3xl font-semibold tracking-tight">
@@ -102,14 +117,33 @@ export default function LoginForm({
           </p>
         </div>
 
-        <form
-          onSubmit={handleSubmit}
-          className="flex flex-col gap-5"
+        {showNotice && (
+  <div className="relative mb-6 rounded-2xl border border-emerald-200/80 bg-emerald-50/70 p-4 pr-10 text-sm text-emerald-900 shadow-sm backdrop-blur-xl">
+    <p className="font-semibold">Account created successfully!</p>
+    <p className="mt-1 text-xs leading-5 text-emerald-800">
+      Please check your email to verify your account before signing in.
+    </p>
+
+    {/* Close button */}
+    <button
+      type="button"
+      onClick={() => setShowNotice(false)}
+      className="absolute right-3 top-3 inline-flex h-6 w-6 items-center justify-center rounded-lg text-emerald-700 transition hover:bg-emerald-200/50 hover:text-emerald-900"
+      aria-label="Close notification"
+    >
+      <span className="text-base leading-none">×</span>
+    </button>
+  </div>
+)}
+
+        <form 
+        onSubmit={handleSubmit} 
+        className="flex flex-col gap-5"
         >
           <div className="flex flex-col gap-2">
-            <label
-              htmlFor="identifier"
-              className="text-sm font-medium"
+            <label 
+            htmlFor="identifier" 
+            className="text-sm font-medium"
             >
               {loginHint}
             </label>
@@ -118,7 +152,7 @@ export default function LoginForm({
               id="identifier"
               type="text"
               value={identifier}
-              onChange={(event) =>
+              onChange={(event) => 
                 setIdentifier(event.target.value)
               }
               autoComplete="username"
@@ -128,18 +162,24 @@ export default function LoginForm({
           </div>
 
           <div className="flex flex-col gap-2">
-            <label
-              htmlFor="password"
-              className="text-sm font-medium"
-            >
-              Password
-            </label>
+            <div className="flex items-center justify-between">
+              <label htmlFor="password" className="text-sm font-medium">
+                Password
+              </label>
+
+              <Link
+                href="/forgot-password"
+                className="text-xs font-medium text-zinc-500 underline-offset-4 hover:text-zinc-900 hover:underline"
+              >
+                Forgot password?
+              </Link>
+            </div>
 
             <input
               id="password"
               type="password"
               value={password}
-              onChange={(event) =>
+              onChange={(event) => 
                 setPassword(event.target.value)
               }
               autoComplete="current-password"
@@ -164,18 +204,14 @@ export default function LoginForm({
         </form>
 
         <p className="mt-6 text-center text-sm text-zinc-600">
-  Don't have an account?{" "}
-  <button
-    type="button"
-    onClick={() => {
-      window.location.href = "/register";
-    }}
-    className="font-medium text-zinc-900 underline underline-offset-4"
-  >
-    Create an account
-  </button>
-  
-</p>
+          Don't have an account?{" "}
+          <Link
+            href="/register"
+            className="font-medium text-zinc-900 underline underline-offset-4"
+          >
+            Create an account
+          </Link>
+        </p>
       </div>
     </div>
   );
