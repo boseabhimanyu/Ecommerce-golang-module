@@ -86,10 +86,6 @@ export default function ProfileForm({
     user.email ?? "",
   );
 
-  const [altEmail, setAltEmail] = useState(
-    user.altEmail ?? "",
-  );
-
   const [phone, setPhone] = useState(
     user.phone ?? "",
   );
@@ -148,7 +144,6 @@ export default function ProfileForm({
           lastName: lastName.trim(),
           username: username.trim(),
           email: email.trim(),
-          altEmail: altEmail.trim(),
           phone: phone.trim(),
           dateOfBirth: apiDateOfBirth,
           addressLine1: addressLine1.trim(),
@@ -369,18 +364,6 @@ export default function ProfileForm({
               inputMode="email"
               onChange={(event) =>
                 setEmail(event.target.value)
-              }
-            />
-
-            <ProfileField
-              id="altEmail"
-              label="Alternative email"
-              type="email"
-              value={altEmail}
-              autoComplete="email"
-              inputMode="email"
-              onChange={(event) =>
-                setAltEmail(event.target.value)
               }
             />
 

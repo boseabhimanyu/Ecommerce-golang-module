@@ -11,7 +11,6 @@ type UpdateUserProfileRequest struct {
 	LastName    *string `json:"lastName"`
 	Username    *string `json:"username"`
 	Email       *string `json:"email"`
-	AltEmail    *string `json:"altEmail"`
 	Phone       *string `json:"phone"`
 	DateOfBirth *string `json:"dateOfBirth"`
 }

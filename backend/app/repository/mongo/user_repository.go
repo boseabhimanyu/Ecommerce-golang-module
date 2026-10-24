@@ -150,7 +150,6 @@ func (r *UserRepository) Update(
 			"last_name":     user.LastName,
 			"username":      strings.TrimSpace(user.Username),
 			"email":         strings.ToLower(strings.TrimSpace(user.Email)),
-			"alt_email":     user.AltEmail,
 			"phone":         user.Phone,
 			"date_of_birth": user.DateOfBirth,
 
@@ -420,7 +419,6 @@ func (r *UserRepository) FindByAnyEmail(
 	filter := bson.M{
 		"$or": bson.A{
 			bson.M{"email": email},
-			bson.M{"alt_email": email},
 		},
 	}
 
@@ -450,7 +448,6 @@ func (r *UserRepository) FindByLoginIdentifier(
 		"$or": bson.A{
 			bson.M{"username": identifier},
 			bson.M{"email": identifier},
-			bson.M{"alt_email": identifier},
 			bson.M{"phone": identifier},
 		},
 	}
@@ -494,7 +491,6 @@ func (r *UserRepository) ListCustomers(
 			bson.M{"last_name": searchRegex},
 			bson.M{"username": searchRegex},
 			bson.M{"email": searchRegex},
-			bson.M{"alt_email": searchRegex},
 			bson.M{"phone": searchRegex},
 		}
 	}

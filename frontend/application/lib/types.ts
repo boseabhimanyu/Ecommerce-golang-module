@@ -4,7 +4,6 @@ export type User = {
   lastName: string;
   username: string;
   email: string;
-  altEmail: string;
   phone: string;
   role: string;
   profilePic?: string | null;

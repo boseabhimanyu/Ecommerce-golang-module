@@ -84,12 +84,6 @@ func (r *ApplicationSettingsRepository) EnsureDefaults(ctx context.Context) erro
 							false,
 						},
 					},
-					"login_with_alt_email": bson.M{
-						"$ifNull": bson.A{
-							"$login_with_alt_email",
-							false,
-						},
-					},
 					"updated_at": bson.M{
 						"$ifNull": bson.A{
 							"$updated_at",
@@ -167,7 +161,6 @@ func (r *ApplicationSettingsRepository) UpdateLoginIdentifiers(
 	primaryEmail bool,
 	username bool,
 	phone bool,
-	altEmail bool,
 	updatedBy string,
 ) error {
 	_, err := r.collection.UpdateOne(
@@ -178,7 +171,6 @@ func (r *ApplicationSettingsRepository) UpdateLoginIdentifiers(
 				"login_with_primary_email": primaryEmail,
 				"login_with_username":      username,
 				"login_with_phone":         phone,
-				"login_with_alt_email":     altEmail,
 				"updated_at":               time.Now().UTC(),
 				"updated_by":               updatedBy,
 			},

@@ -103,13 +103,11 @@ func (s *SettingsService) UpdateLoginIdentifiers(
 	primaryEmail bool,
 	username bool,
 	phone bool,
-	altEmail bool,
 	updatedBy string,
 ) error {
 	if !primaryEmail &&
 		!username &&
-		!phone &&
-		!altEmail {
+		!phone {
 		return errors.New(
 			"At least one login identifier must be enabled",
 		)
@@ -120,7 +118,6 @@ func (s *SettingsService) UpdateLoginIdentifiers(
 		primaryEmail,
 		username,
 		phone,
-		altEmail,
 		updatedBy,
 	)
 }
@@ -145,10 +142,6 @@ func (s *SettingsService) GetLoginHint(
 
 	if settings.LoginWithPhone {
 		identifiers = append(identifiers, "phone number")
-	}
-
-	if settings.LoginWithAltEmail {
-		identifiers = append(identifiers, "alternate email")
 	}
 
 	switch len(identifiers) {

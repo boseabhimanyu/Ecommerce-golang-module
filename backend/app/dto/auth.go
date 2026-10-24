@@ -13,9 +13,8 @@ type RegisterRequest struct {
 
 	Username string `json:"username"`
 
-	Email    string `json:"email"`
-	AltEmail string `json:"altEmail"`
-	Phone    string `json:"phone"`
+	Email string `json:"email"`
+	Phone string `json:"phone"`
 
 	Password string `json:"password"`
 }

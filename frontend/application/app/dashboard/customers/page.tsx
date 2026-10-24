@@ -16,7 +16,6 @@ type Customer = {
   lastName: string;
   username: string;
   email: string;
-  altEmail: string;
   phone: string;
   role: string;
   profilePic?: string | null;
@@ -38,7 +37,6 @@ type CustomerForm = {
   lastName: string;
   username: string;
   email: string;
-  altEmail: string;
   phone: string;
   dateOfBirth: string;
   addressLine1: string;
@@ -53,7 +51,6 @@ const emptyCustomerForm: CustomerForm = {
   lastName: "",
   username: "",
   email: "",
-  altEmail: "",
   phone: "",
   dateOfBirth: "",
   addressLine1: "",
@@ -144,7 +141,6 @@ function customerToForm(
     lastName: customer.lastName ?? "",
     username: customer.username ?? "",
     email: customer.email ?? "",
-    altEmail: customer.altEmail ?? "",
     phone: customer.phone ?? "",
     dateOfBirth: formatDateForInput(
       customer.dateOfBirth,
@@ -287,7 +283,6 @@ export default function CustomersPage() {
     lastName: "",
     username: "",
     email: "",
-    altEmail: "",
     phone: "",
     password: "",
   });
@@ -668,7 +663,6 @@ export default function CustomersPage() {
         lastName: "",
         username: "",
         email: "",
-        altEmail: "",
         phone: "",
         password: "",
       });
@@ -1051,19 +1045,6 @@ export default function CustomersPage() {
                   }
                 />
 
-                <CustomerField
-                  label="Alternate email"
-                  type="email"
-                  value={
-                    newCustomer.altEmail
-                  }
-                  onChange={(value) =>
-                    updateNewCustomer(
-                      "altEmail",
-                      value,
-                    )
-                  }
-                />
 
                 <CustomerField
                   label="Phone"
@@ -1237,20 +1218,6 @@ export default function CustomersPage() {
                         onChange={(value) =>
                           updateCustomerForm(
                             "email",
-                            value,
-                          )
-                        }
-                      />
-
-                      <CustomerField
-                        label="Alternate email"
-                        type="email"
-                        value={
-                          customerForm.altEmail
-                        }
-                        onChange={(value) =>
-                          updateCustomerForm(
-                            "altEmail",
                             value,
                           )
                         }

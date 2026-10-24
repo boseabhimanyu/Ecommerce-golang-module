@@ -103,15 +103,13 @@ func (h *UserHandler) UpdateProfile(c *gin.Context) {
 			})
 
 		case errors.Is(err, apperrors.ErrEmailAlreadyExists),
-			errors.Is(err, apperrors.ErrAltEmailAlreadyExists),
 			errors.Is(err, apperrors.ErrUsernameAlreadyExists),
 			errors.Is(err, apperrors.ErrPhoneAlreadyExists):
 			c.JSON(http.StatusConflict, gin.H{
 				"error": err.Error(),
 			})
 
-		case errors.Is(err, apperrors.ErrAltEmailSameAsEmail),
-			errors.Is(err, apperrors.ErrNoFieldsToUpdate):
+		case errors.Is(err, apperrors.ErrNoFieldsToUpdate):
 			c.JSON(http.StatusBadRequest, gin.H{
 				"error": err.Error(),
 			})
@@ -149,15 +147,9 @@ func (h *UserHandler) CreateCustomer(c *gin.Context) {
 	if err != nil {
 		switch {
 		case errors.Is(err, apperrors.ErrEmailAlreadyExists),
-			errors.Is(err, apperrors.ErrAltEmailAlreadyExists),
 			errors.Is(err, apperrors.ErrUsernameAlreadyExists),
 			errors.Is(err, apperrors.ErrPhoneAlreadyExists):
 			c.JSON(http.StatusConflict, gin.H{
-				"error": err.Error(),
-			})
-
-		case errors.Is(err, apperrors.ErrAltEmailSameAsEmail):
-			c.JSON(http.StatusBadRequest, gin.H{
 				"error": err.Error(),
 			})
 
@@ -212,15 +204,13 @@ func (h *UserHandler) UpdateCustomer(c *gin.Context) {
 			})
 
 		case errors.Is(err, apperrors.ErrEmailAlreadyExists),
-			errors.Is(err, apperrors.ErrAltEmailAlreadyExists),
 			errors.Is(err, apperrors.ErrUsernameAlreadyExists),
 			errors.Is(err, apperrors.ErrPhoneAlreadyExists):
 			c.JSON(http.StatusConflict, gin.H{
 				"error": err.Error(),
 			})
 
-		case errors.Is(err, apperrors.ErrAltEmailSameAsEmail),
-			errors.Is(err, apperrors.ErrNoFieldsToUpdate):
+		case errors.Is(err, apperrors.ErrNoFieldsToUpdate):
 			c.JSON(http.StatusBadRequest, gin.H{
 				"error": err.Error(),
 			})

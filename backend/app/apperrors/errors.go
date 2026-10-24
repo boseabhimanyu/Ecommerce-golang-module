@@ -6,8 +6,6 @@ import (
 
 var (
 	ErrEmailAlreadyExists    = errors.New("email already exists")
-	ErrAltEmailAlreadyExists = errors.New("alternate email already exists")
-	ErrAltEmailSameAsEmail   = errors.New("alternate email must be different from primary email")
 	ErrUsernameAlreadyExists = errors.New("username already exists")
 	ErrPhoneAlreadyExists    = errors.New("phone number already exists")
 	ErrEmailNotVerified      = errors.New("Email not verified")

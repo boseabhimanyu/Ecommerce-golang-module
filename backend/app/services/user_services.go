@@ -144,19 +144,6 @@ func (s *UserService) UpdateProfile(
 		hasUpdates = true
 	}
 
-	if req.AltEmail != nil {
-		altEmail, err := validation.ValidateEmail(
-			*req.AltEmail,
-			false,
-		)
-		if err != nil {
-			return nil, err
-		}
-
-		user.AltEmail = altEmail
-		hasUpdates = true
-	}
-
 	if req.Phone != nil {
 		phone, err := validation.ValidatePhone(*req.Phone)
 		if err != nil {
@@ -183,10 +170,6 @@ func (s *UserService) UpdateProfile(
 		return nil, apperrors.ErrNoFieldsToUpdate
 	}
 
-	if user.AltEmail != "" && user.AltEmail == user.Email {
-		return nil, apperrors.ErrAltEmailSameAsEmail
-	}
-
 	// Primary email must not belong to another user's email/alternate email.
 	if user.Email != currentUser.Email {
 		existingUser, err := s.userRepository.FindByAnyEmail(
@@ -197,25 +180,6 @@ func (s *UserService) UpdateProfile(
 			existingUser != nil &&
 			existingUser.ID != currentUser.ID {
 			return nil, apperrors.ErrEmailAlreadyExists
-		}
-
-		if err != nil &&
-			!errors.Is(err, apperrors.ErrUserNotFound) {
-			return nil, err
-		}
-	}
-
-	// Alternate email must not belong to another user's email/alternate email.
-	if user.AltEmail != "" &&
-		user.AltEmail != currentUser.AltEmail {
-		existingUser, err := s.userRepository.FindByAnyEmail(
-			ctx,
-			user.AltEmail,
-		)
-		if err == nil &&
-			existingUser != nil &&
-			existingUser.ID != currentUser.ID {
-			return nil, apperrors.ErrAltEmailAlreadyExists
 		}
 
 		if err != nil &&
@@ -423,15 +387,6 @@ func (s *UserService) CreateCustomer(
 		return nil, err
 	}
 
-	altEmail, err := validation.ValidateEmail(req.AltEmail, false)
-	if err != nil {
-		return nil, err
-	}
-
-	if altEmail != "" && altEmail == email {
-		return nil, apperrors.ErrAltEmailSameAsEmail
-	}
-
 	phone, err := validation.ValidatePhone(req.Phone)
 	if err != nil {
 		return nil, err
@@ -448,21 +403,6 @@ func (s *UserService) CreateCustomer(
 
 	if err != nil && !errors.Is(err, apperrors.ErrUserNotFound) {
 		return nil, err
-	}
-
-	if altEmail != "" {
-		existingUser, err = s.userRepository.FindByAnyEmail(
-			ctx,
-			altEmail,
-		)
-		if err == nil && existingUser != nil {
-			return nil, apperrors.ErrAltEmailAlreadyExists
-		}
-
-		if err != nil &&
-			!errors.Is(err, apperrors.ErrUserNotFound) {
-			return nil, err
-		}
 	}
 
 	existingUser, err = s.userRepository.FindByUsername(ctx, username)
@@ -497,7 +437,6 @@ func (s *UserService) CreateCustomer(
 	user.LastName = lastName
 	user.Username = username
 	user.Email = email
-	user.AltEmail = altEmail
 	user.Phone = phone
 	user.PasswordHash = string(passwordHash)
 

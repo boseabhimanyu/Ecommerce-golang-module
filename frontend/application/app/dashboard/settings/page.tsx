@@ -18,7 +18,6 @@ type Settings = {
   login_with_primary_email: boolean;
   login_with_username: boolean;
   login_with_phone: boolean;
-  login_with_alt_email: boolean;
   menu_max_depth: MenuMaxDepth;
 };
 
@@ -28,7 +27,6 @@ const defaultSettings: Settings = {
   login_with_primary_email: false,
   login_with_username: false,
   login_with_phone: false,
-  login_with_alt_email: false,
   menu_max_depth: {
     top: 1,
     left: 1,
@@ -372,19 +370,6 @@ export default function SettingsPage() {
               onChange={(value) =>
                 updateSetting(
                   "login_with_phone",
-                  value,
-                )
-              }
-            />
-
-            <ToggleRow
-              label="Alternate email"
-              enabled={
-                settings.login_with_alt_email
-              }
-              onChange={(value) =>
-                updateSetting(
-                  "login_with_alt_email",
                   value,
                 )
               }

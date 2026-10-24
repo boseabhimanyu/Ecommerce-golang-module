@@ -63,7 +63,6 @@ func (h *SettingsHandler) GetPrivateSettings(c *gin.Context) {
 		LoginWithPrimaryEmail: settings.LoginWithPrimaryEmail,
 		LoginWithUsername:     settings.LoginWithUsername,
 		LoginWithPhone:        settings.LoginWithPhone,
-		LoginWithAltEmail:     settings.LoginWithAltEmail,
 		MenuMaxDepth: dto.MenuMaxDepthResponse{
 			Top:    settings.MenuMaxDepth.Top,
 			Left:   settings.MenuMaxDepth.Left,
@@ -87,7 +86,6 @@ func (h *SettingsHandler) Update(c *gin.Context) {
 		req.LoginWithPrimaryEmail == nil &&
 		req.LoginWithUsername == nil &&
 		req.LoginWithPhone == nil &&
-		req.LoginWithAltEmail == nil &&
 		req.MenuMaxDepth == nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"error": "no settings to update",
@@ -146,8 +144,7 @@ func (h *SettingsHandler) Update(c *gin.Context) {
 
 	if req.LoginWithPrimaryEmail != nil ||
 		req.LoginWithUsername != nil ||
-		req.LoginWithPhone != nil ||
-		req.LoginWithAltEmail != nil {
+		req.LoginWithPhone != nil {
 
 		settings, err := h.settingsService.GetSettings(
 			c.Request.Context(),
@@ -162,7 +159,6 @@ func (h *SettingsHandler) Update(c *gin.Context) {
 		primaryEmail := settings.LoginWithPrimaryEmail
 		username := settings.LoginWithUsername
 		phone := settings.LoginWithPhone
-		altEmail := settings.LoginWithAltEmail
 
 		if req.LoginWithPrimaryEmail != nil {
 			primaryEmail = *req.LoginWithPrimaryEmail
@@ -176,16 +172,11 @@ func (h *SettingsHandler) Update(c *gin.Context) {
 			phone = *req.LoginWithPhone
 		}
 
-		if req.LoginWithAltEmail != nil {
-			altEmail = *req.LoginWithAltEmail
-		}
-
 		if err := h.settingsService.UpdateLoginIdentifiers(
 			c.Request.Context(),
 			primaryEmail,
 			username,
 			phone,
-			altEmail,
 			actorID,
 		); err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{

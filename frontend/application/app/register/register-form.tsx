@@ -11,7 +11,6 @@ export default function RegisterForm() {
   const [lastName, setLastName] = useState("");
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
-  const [altEmail, setAltEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
 const [confirmPassword, setConfirmPassword] = useState("");
@@ -45,7 +44,6 @@ const [confirmPassword, setConfirmPassword] = useState("");
       lastName: lastName.trim(),
       username: username.trim(),
       email: email.trim(),
-      altEmail: altEmail.trim(),
       phone: phone.trim(),
       password,
     });
@@ -129,14 +127,6 @@ const [confirmPassword, setConfirmPassword] = useState("");
   required
 />
 
-            <Field
-  id="altEmail"
-  label="Alternative email"
-  type="email"
-  value={altEmail}
-  onChange={setAltEmail}
-  autoComplete="email"
-/>
           </div>
 
           <Field

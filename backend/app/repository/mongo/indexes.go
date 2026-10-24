@@ -47,21 +47,6 @@ func EnsureUserIndexes(
 		},
 		{
 			Keys: bson.D{
-				{Key: "alt_email", Value: 1},
-			},
-			Options: options.Index().
-				SetUnique(true).
-				SetPartialFilterExpression(
-					bson.M{
-						"alt_email": bson.M{
-							"$gt": "",
-						},
-					},
-				).
-				SetName("unique_alt_email"),
-		},
-		{
-			Keys: bson.D{
 				{Key: "email_verification_token", Value: 1},
 			},
 			Options: options.Index().
