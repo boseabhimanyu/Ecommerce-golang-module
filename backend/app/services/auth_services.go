@@ -732,6 +732,42 @@ func (s *AuthService) ResetPassword(ctx context.Context, req dto.ResetPasswordRe
 		return apperrors.ErrInvalidOrExpiredToken
 	}
 
+	// Check dynamic platform 2FA setting
+	twoFactorGloballyEnabled, err := s.settingsService.IsTwoFactorEnabled(ctx)
+	if err != nil {
+		return err
+	}
+
+	// Only enforce 2FA if enabled globally AND enabled on this user account
+	if twoFactorGloballyEnabled && user.TwoFactorEnabled {
+		code := strings.TrimSpace(req.Code)
+		if code == "" {
+			return apperrors.ErrTwoFactorRequired
+		}
+
+		if len(code) == 6 {
+			totpEncryptionService, err := s.getTOTPEncryptionService()
+			if err != nil {
+				return err
+			}
+
+			decryptedSecret, err := totpEncryptionService.Decrypt(user.TwoFactorSecret)
+			if err != nil {
+				return apperrors.ErrInvalidTOTPCode
+			}
+
+			if err := s.totpService.VerifyCode(decryptedSecret, code); err != nil {
+				return apperrors.ErrInvalidTOTPCode
+			}
+		} else {
+			// Verify & burn backup code
+			_, err := s.verifyBackupCode(ctx, user, code)
+			if err != nil {
+				return apperrors.ErrInvalidTOTPCode
+			}
+		}
+	}
+
 	// Hash new password using bcrypt
 	newHash, err := bcrypt.GenerateFromPassword([]byte(req.NewPassword), bcrypt.DefaultCost)
 	if err != nil {
@@ -743,7 +779,14 @@ func (s *AuthService) ResetPassword(ctx context.Context, req dto.ResetPasswordRe
 	user.PasswordResetToken = ""
 	user.PasswordResetExpiry = nil
 
-	return s.userRepository.Update(ctx, user)
+	if err := s.userRepository.Update(ctx, user); err != nil {
+		return err
+	}
+
+	// Revoke all active sessions across devices
+	_ = s.refreshTokenRepository.RevokeAllByUserID(ctx, user.ID.Hex())
+
+	return nil
 }
 
 func hashToken(token string) string {

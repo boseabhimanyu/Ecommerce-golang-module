@@ -58,4 +58,5 @@ var (
 	ErrTwoFactorAlreadyEnabled  = errors.New("two-factor authentication is already enabled")
 	ErrInvalidBackupCode        = errors.New("invalid backup code")
 	ErrTwoFactorResetNotAllowed = errors.New("two-factor reset is not allowed for this user")
+	ErrTwoFactorRequired        = errors.New("Enter 2FA or backup code")
 )

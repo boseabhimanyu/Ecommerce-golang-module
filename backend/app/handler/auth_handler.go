@@ -782,8 +782,27 @@ func (h *AuthHandler) ResetPassword(c *gin.Context) {
 	}
 
 	if err := h.authService.ResetPassword(c.Request.Context(), req); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
+		switch {
+		case errors.Is(err, apperrors.ErrTwoFactorRequired):
+			c.JSON(http.StatusForbidden, gin.H{
+				"error":             "two-factor code is required to complete reset",
+				"twoFactorRequired": true,
+			})
+			return
+		case errors.Is(err, apperrors.ErrInvalidTOTPCode):
+			c.JSON(http.StatusBadRequest, gin.H{
+				"error": "invalid two-factor or backup code",
+			})
+			return
+		case errors.Is(err, apperrors.ErrInvalidOrExpiredToken):
+			c.JSON(http.StatusBadRequest, gin.H{
+				"error": "invalid or expired reset token",
+			})
+			return
+		default:
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
 	}
 
 	c.JSON(http.StatusOK, gin.H{
