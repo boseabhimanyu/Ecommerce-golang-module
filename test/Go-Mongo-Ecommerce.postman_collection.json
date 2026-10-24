@@ -1,15 +1,217 @@
 {
   "info": {
-    "_postman_id": "d4e99a0d-1996-499e-b3b4-d4d0cc912246",
-    "name": "Go-Mongo-Basic app",
+    "_postman_id": "a5250c40-8d45-4bd5-8eb2-fc46264b64c7",
+    "name": "Go-Mongo-Ecommerce",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
     "_exporter_id": "27437251",
-    "_collection_link": "https://go.postman.co/collection/27437251-d4e99a0d-1996-499e-b3b4-d4d0cc912246?source=collection_link"
+    "_collection_link": "https://go.postman.co/collection/27437251-a5250c40-8d45-4bd5-8eb2-fc46264b64c7?source=collection_link"
   },
   "item": [
     {
       "name": "Users",
       "item": [
+        {
+          "name": "Address management",
+          "item": [
+            {
+              "name": "Add address",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "\n{\n  \"fullName\": \"Work\",\n  \"phone\": \"6966989658\",\n  \"line1\": \"44 Bhojerhat road\",\n  \"line2\": \"\",\n  \"city\": \"Kolkata\",\n  \"state\": \"West Bengal\",\n  \"pinCode\": \"743252\",\n  \"country\": \"India\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:{{port}}/api/v1/auth/addresses",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "{{port}}",
+                  "path": [
+                    "api",
+                    "v1",
+                    "auth",
+                    "addresses"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Get All addresses",
+              "protocolProfileBehavior": {
+                "disableBodyPruning": true
+              },
+              "request": {
+                "method": "GET",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "\n{\n  \"fullName\": \"Home\",\n  \"phone\": \"8876543210\",\n  \"line1\": \"12 Park Street\",\n  \"line2\": \"Apartment 3B\",\n  \"city\": \"Kolkata\",\n  \"state\": \"West Bengal\",\n  \"pinCode\": \"700016\",\n  \"country\": \"India\",\n  \"isDefault\": false\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:{{port}}/api/v1/auth/addresses",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "{{port}}",
+                  "path": [
+                    "api",
+                    "v1",
+                    "auth",
+                    "addresses"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Get address by ID",
+              "protocolProfileBehavior": {
+                "disableBodyPruning": true
+              },
+              "request": {
+                "method": "GET",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "\n{\n  \"fullName\": \"Home\",\n  \"phone\": \"8876543210\",\n  \"line1\": \"12 Park Street\",\n  \"line2\": \"Apartment 3B\",\n  \"city\": \"Kolkata\",\n  \"state\": \"West Bengal\",\n  \"pinCode\": \"700016\",\n  \"country\": \"India\",\n  \"isDefault\": false\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:{{port}}/api/v1/auth/addresses/6ada429a9f50fb7bd0f12dee",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "{{port}}",
+                  "path": [
+                    "api",
+                    "v1",
+                    "auth",
+                    "addresses",
+                    "6ada429a9f50fb7bd0f12dee"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Update address by ID",
+              "request": {
+                "method": "PATCH",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "\n{\n\"fullName\": \"Woork\",\n    \"phone\": \"6966996658\",\n    \"line1\": \"45 Bhojerhat road\",\n    \"line2\": \"\",\n    \"city\": \"Kolkata\",\n    \"state\": \"West Bengal\",\n    \"pinCode\": \"743252\",\n    \"country\": \"China\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:{{port}}/api/v1/auth/addresses/6ada429a9f50fb7bd0f12dee",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "{{port}}",
+                  "path": [
+                    "api",
+                    "v1",
+                    "auth",
+                    "addresses",
+                    "6ada429a9f50fb7bd0f12dee"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Set default address",
+              "request": {
+                "method": "PATCH",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "\n{\n\"fullName\": \"Woork\",\n    \"phone\": \"6966996658\",\n    \"line1\": \"45 Bhojerhat road\",\n    \"line2\": \"\",\n    \"city\": \"Kolkata\",\n    \"state\": \"West Bengal\",\n    \"pinCode\": \"743252\",\n    \"country\": \"China\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:{{port}}/api/v1/auth/addresses/6ada429a9f50fb7bd0f12dee/default",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "{{port}}",
+                  "path": [
+                    "api",
+                    "v1",
+                    "auth",
+                    "addresses",
+                    "6ada429a9f50fb7bd0f12dee",
+                    "default"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Delete address by ID",
+              "request": {
+                "method": "DELETE",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "\n{\n\"fullName\": \"Woork\",\n    \"phone\": \"6966996658\",\n    \"line1\": \"45 Bhojerhat road\",\n    \"line2\": \"\",\n    \"city\": \"Kolkata\",\n    \"state\": \"West Bengal\",\n    \"pinCode\": \"743252\",\n    \"country\": \"China\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:{{port}}/api/v1/auth/addresses/6ada429a9f50fb7bd0f12dee",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "{{port}}",
+                  "path": [
+                    "api",
+                    "v1",
+                    "auth",
+                    "addresses",
+                    "6ada429a9f50fb7bd0f12dee"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
         {
           "name": "Register",
           "request": {
@@ -67,6 +269,130 @@
                 "v1",
                 "auth",
                 "login"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Verify Email",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"token\": \"bab4148cba9376dd2e7237aff514a89a12c7bc4d97832af4f37d72500dcb29db\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:{{port}}/api/v1/auth/verify-email",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "{{port}}",
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "verify-email"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Resend verification email",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:{{port}}/api/v1/auth/resend-verification",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "{{port}}",
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "resend-verification"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Forgot Password",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"<PASTE_THE_COPIED_TOKEN_HERE>\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:{{port}}/api/v1/auth/forgot-password",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "{{port}}",
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "forgot-password"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Reset Password",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"token\": \"<PASTE_THE_COPIED_TOKEN_HERE>\",\n  \"newPassword\":\"\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:{{port}}/api/v1/auth/reset-password",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "{{port}}",
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "reset-password"
               ]
             }
           },
@@ -439,7 +765,7 @@
                 "header": [],
                 "body": {
                   "mode": "raw",
-                  "raw": "// {\n//   \"firstName\": \"Rahul\",\n//   \"lastName\": \"Sharma\",\n//   \"username\": \"rahulsharma\",\n//   \"email\": \"rahul@example.com\",\n//   \"altEmail\": \"rahul.personal@example.com\",\n//   \"phone\": \"9876543210\",\n//   \"dateOfBirth\": \"15-12-1990\",\n//   \"addressLine1\": \"12 MG Road\",\n//   \"addressLine2\": \"Near Metro Station\",\n//   \"city\": \"Bengaluru\",\n//   \"state\": \"Karnataka\",\n//   \"pinCode\": \"560001\"\n// }\n\n{\n  \"firstName\": \"Rahul\",\n  \"lastName\": \"Sharma\",\n  \"username\": \"rahulsharma\",\n  \"email\": \"rahul@example.com\",\n  \"altEmail\": \"rahul.personal@example.com\",\n  \"phone\": \"9876543210\",\n  \"dateOfBirth\": \"15-12-1990\",\n  \"addressLine1\": \"12 MG Road\",\n  \"addressLine2\": \"Near Metro Station\",\n  \"city\": \"Bengaluru\",\n  \"state\": \"Karnataka\",\n  \"pinCode\": \"560001\"\n}",
+                  "raw": "// {\n//   \"firstName\": \"Rahul\",\n//   \"lastName\": \"Sharma\",\n//   \"username\": \"rahulsharma\",\n//   \"email\": \"rahul@example.com\",\n//   \"altEmail\": \"rahul.personal@example.com\",\n//   \"phone\": \"9876543210\",\n//   \"dateOfBirth\": \"15-12-1990\",\n// }\n\n{\n  \"firstName\": \"Rahul\",\n  \"lastName\": \"Sharma\",\n  \"username\": \"rahulsharma\",\n  \"email\": \"rahul@example.com\",\n  \"altEmail\": \"rahul.personal@example.com\",\n  \"phone\": \"9876543210\",\n  \"dateOfBirth\": \"15-12-1990\"\n}",
                   "options": {
                     "raw": {
                       "language": "json"
@@ -763,7 +1089,7 @@
                   }
                 },
                 "url": {
-                  "raw": "http://localhost:{{port}}/api/v1/admin/pages?page=1&limit=20&visibility=public&authorId=6aa2cfce102f1f260ac1d59f",
+                  "raw": "http://localhost:{{port}}/api/v1/admin/pages",
                   "protocol": "http",
                   "host": [
                     "localhost"
@@ -774,24 +1100,41 @@
                     "v1",
                     "admin",
                     "pages"
-                  ],
-                  "query": [
-                    {
-                      "key": "page",
-                      "value": "1"
-                    },
-                    {
-                      "key": "limit",
-                      "value": "20"
-                    },
-                    {
-                      "key": "visibility",
-                      "value": "public"
-                    },
-                    {
-                      "key": "authorId",
-                      "value": "6aa2cfce102f1f260ac1d59f"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Get Page by ID",
+              "protocolProfileBehavior": {
+                "disableBodyPruning": true
+              },
+              "request": {
+                "method": "GET",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "\n\n// GET /api/v1/admin/pages\n// GET /api/v1/admin/pages?page=1&limit=20\n// GET /api/v1/admin/pages?visibility=public\n// GET /api/v1/admin/pages?visibility=registered\n// GET /api/v1/admin/pages?authorId=<id>\n\n// http://localhost:{{port}}/api/v1/admin/pages?page=1&limit=20&visibility=public&authorId=6aa2cfce102f1f260ac1d59f",
+                  "options": {
+                    "raw": {
+                      "language": "json"
                     }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:{{port}}/api/v1/admin/pages/6acb977185bb7c292f8d7592",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "{{port}}",
+                  "path": [
+                    "api",
+                    "v1",
+                    "admin",
+                    "pages",
+                    "6acb977185bb7c292f8d7592"
                   ]
                 }
               },
@@ -1091,7 +1434,7 @@
                   }
                 },
                 "url": {
-                  "raw": "http://localhost:{{port}}/api/v1/admin/menus/6abf3cc5a8b0c945d4bb739c",
+                  "raw": "http://localhost:{{port}}/api/v1/admin/menus/6acb935585bb7c292f8d7590",
                   "protocol": "http",
                   "host": [
                     "localhost"
@@ -1102,7 +1445,7 @@
                     "v1",
                     "admin",
                     "menus",
-                    "6abf3cc5a8b0c945d4bb739c"
+                    "6acb935585bb7c292f8d7590"
                   ]
                 }
               },
@@ -1327,7 +1670,7 @@
               "raw": "// {\n//   \"title\": \"About Us\",\n//   \"content\": \"About Us page\",\n//   \"visibility\" : \"public\"/\"registered\"\n// }\n\nhttp://localhost:{{port}}/api/v1/menus/bottom\nhttp://localhost:{{port}}/api/v1/menus/top\nhttp://localhost:{{port}}/api/v1/menus/left"
             },
             "url": {
-              "raw": "http://localhost:{{port}}/api/v1/menus/left",
+              "raw": "http://localhost:{{port}}/api/v1/menus/top",
               "protocol": "http",
               "host": [
                 "localhost"
@@ -1337,7 +1680,7 @@
                 "api",
                 "v1",
                 "menus",
-                "left"
+                "top"
               ]
             }
           },

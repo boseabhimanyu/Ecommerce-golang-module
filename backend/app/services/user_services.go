@@ -708,9 +708,14 @@ func (s *UserService) DisableTwoFactor(
 	code string,
 ) error {
 	userID = strings.TrimSpace(userID)
+	code = strings.TrimSpace(code)
 
 	if userID == "" {
 		return apperrors.ErrInvalidUserID
+	}
+
+	if code == "" {
+		return apperrors.ErrInvalidTOTPCode
 	}
 
 	user, err := s.userRepository.FindByID(ctx, userID)
@@ -722,31 +727,34 @@ func (s *UserService) DisableTwoFactor(
 		return apperrors.ErrInvalidCredentials
 	}
 
-	if !user.TwoFactorEnabled ||
-		strings.TrimSpace(user.TwoFactorSecret) == "" {
+	if !user.TwoFactorEnabled || strings.TrimSpace(user.TwoFactorSecret) == "" {
 		return apperrors.ErrTwoFactorNotEnabled
 	}
 
-	totpEncryptionService, err := s.getTOTPEncryptionService()
-	if err != nil {
-		return err
+	// Check code type: 6-digit TOTP vs Backup Code
+	if len(code) == 6 {
+		totpEncryptionService, err := s.getTOTPEncryptionService()
+		if err != nil {
+			return err
+		}
+
+		decryptedSecret, err := totpEncryptionService.Decrypt(user.TwoFactorSecret)
+		if err != nil {
+			return apperrors.ErrInvalidTOTPCode
+		}
+
+		if err := s.totpService.VerifyCode(decryptedSecret, code); err != nil {
+			return apperrors.ErrInvalidTOTPCode
+		}
+	} else {
+		// Backup code verification (removes the code if valid)
+		_, err = s.VerifyBackupCode(ctx, user.ID.Hex(), code)
+		if err != nil {
+			return apperrors.ErrInvalidTOTPCode
+		}
 	}
 
-	decryptedSecret, err := totpEncryptionService.Decrypt(
-		user.TwoFactorSecret,
-	)
-
-	if err != nil {
-		return err
-	}
-
-	if err := s.totpService.VerifyCode(
-		decryptedSecret,
-		code,
-	); err != nil {
-		return err
-	}
-
+	// Wipe all 2FA settings and remaining backup codes
 	user.TwoFactorEnabled = false
 	user.TwoFactorSecret = ""
 	user.TwoFactorPendingSecret = ""

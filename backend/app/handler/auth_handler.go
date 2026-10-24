@@ -620,7 +620,7 @@ func (h *AuthHandler) DisableTwoFactor(c *gin.Context) {
 		}
 
 		c.JSON(http.StatusInternalServerError, gin.H{
-			"error": "failed to disable two-factor authentication",
+			"error": "Enter correct 2fA or backup code",
 		})
 		return
 	}

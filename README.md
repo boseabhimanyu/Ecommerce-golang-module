@@ -148,6 +148,19 @@ TOTP_ENCRYPTION_KEY=<32-byte-secret>
 BACKUP_CODE_COUNT=10
 BACKUP_CODE_LOW_THRESHOLD=4
 
+# Email / SMTP Configuration
+SMTP_HOST=smtp-relay.brevo.com       # or smtp.gmail.com / sandbox.smtp.mailtrap.io
+SMTP_PORT=587
+SMTP_USERNAME=your-smtp-login-email
+SMTP_PASSWORD=your-smtp-password-or-app-key
+SMTP_FROM_EMAIL=no-reply@yourdomain.com
+SMTP_FROM_NAME="Store Name"
+EMAIL_PROVIDER=smtp                  # "logger" for dev console, "smtp" for real email
+
+# Token Expiry Durations (Go duration format: 24h, 1h, 30m)
+EMAIL_VERIFICATION_EXPIRY=24h
+PASSWORD_RESET_EXPIRY=1h
+
 ```
 
 
