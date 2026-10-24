@@ -22,11 +22,29 @@ type RateLimiter struct {
 }
 
 func NewRateLimiter(limit int, window time.Duration) *RateLimiter {
-	return &RateLimiter{
+	limiter := &RateLimiter{
 		entries: make(map[string]rateLimitEntry),
 		limit:   limit,
 		window:  window,
 	}
+
+	// Run cleanup every 2x window interval to clear dead keys
+	go func() {
+		ticker := time.NewTicker(window * 2)
+		defer ticker.Stop()
+
+		for now := range ticker.C {
+			limiter.mu.Lock()
+			for key, entry := range limiter.entries {
+				if now.After(entry.expiresAt) {
+					delete(limiter.entries, key)
+				}
+			}
+			limiter.mu.Unlock()
+		}
+	}()
+
+	return limiter
 }
 
 func (r *RateLimiter) Middleware(keyFunc func(*gin.Context) string) gin.HandlerFunc {

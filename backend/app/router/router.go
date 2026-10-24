@@ -242,6 +242,18 @@ func NewRouter(
 			5,
 			time.Minute,
 		)
+		forgotPasswordLimiter := middleware.NewRateLimiter(
+			3,
+			15*time.Minute,
+		)
+		resetPasswordLimiter := middleware.NewRateLimiter(
+			5,
+			15*time.Minute,
+		)
+		verifyEmailLimiter := middleware.NewRateLimiter(
+			10,
+			time.Minute,
+		)
 
 		// Public
 		authRoutes.POST(
@@ -268,17 +280,36 @@ func NewRouter(
 			authHandler.VerifyTwoFactorLogin,
 		)
 		// Email verification
-		authRoutes.POST("/verify-email", authHandler.VerifyEmail)
+		authRoutes.POST(
+			"/verify-email",
+			verifyEmailLimiter.Middleware(middleware.RateLimitKeyByIP),
+			authHandler.VerifyEmail,
+		)
 
 		// Password Reset
-		authRoutes.POST("/forgot-password", authHandler.ForgotPassword)
-		authRoutes.POST("/reset-password", authHandler.ResetPassword)
+		authRoutes.POST(
+			"/forgot-password",
+			forgotPasswordLimiter.Middleware(middleware.RateLimitKeyByIP),
+			authHandler.ForgotPassword,
+		)
+
+		authRoutes.POST(
+			"/reset-password",
+			resetPasswordLimiter.Middleware(middleware.RateLimitKeyByIP),
+			authHandler.ResetPassword,
+		)
 
 		// Authenticated
 		protected := authRoutes.Group("")
 		protected.Use(authMiddleware)
 
-		protected.POST("/resend-verification", authHandler.ResendVerificationEmail)
+		// Resend verification email (protect your SMTP service)
+		protected.POST(
+			"/resend-verification",
+			twoFactorLimiter.Middleware(middleware.RateLimitKeyByUserID),
+			authHandler.ResendVerificationEmail,
+		)
+
 		protected.PATCH("/password", authHandler.ChangePassword)
 		protected.POST("/logout", authHandler.Logout)
 		protected.PATCH("/me", userHandler.UpdateProfile)
