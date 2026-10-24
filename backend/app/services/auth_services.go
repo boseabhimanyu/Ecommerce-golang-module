@@ -779,6 +779,13 @@ func (s *AuthService) ResetPassword(ctx context.Context, req dto.ResetPasswordRe
 	user.PasswordResetToken = ""
 	user.PasswordResetExpiry = nil
 
+	// Option B: Auto-verify email and clear any pending email verification state
+	if !user.IsEmailVerified {
+		user.IsEmailVerified = true
+		user.EmailVerificationToken = ""
+		user.EmailVerificationExpiry = nil
+	}
+
 	if err := s.userRepository.Update(ctx, user); err != nil {
 		return err
 	}
