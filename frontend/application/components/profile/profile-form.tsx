@@ -94,26 +94,6 @@ export default function ProfileForm({
     formatDateForInput(user.dateOfBirth),
   );
 
-  const [addressLine1, setAddressLine1] = useState(
-    user.addressLine1 ?? "",
-  );
-
-  const [addressLine2, setAddressLine2] = useState(
-    user.addressLine2 ?? "",
-  );
-
-  const [city, setCity] = useState(
-    user.city ?? "",
-  );
-
-  const [state, setState] = useState(
-    user.state ?? "",
-  );
-
-  const [pinCode, setPinCode] = useState(
-    user.pinCode ?? "",
-  );
-
   const [profilePic, setProfilePic] = useState(
     user.profilePic ?? "",
   );
@@ -146,11 +126,6 @@ export default function ProfileForm({
           email: email.trim(),
           phone: phone.trim(),
           dateOfBirth: apiDateOfBirth,
-          addressLine1: addressLine1.trim(),
-          addressLine2: addressLine2.trim(),
-          city: city.trim(),
-          state: state.trim(),
-          pinCode: pinCode.trim(),
         },
       );
 
@@ -382,73 +357,6 @@ export default function ProfileForm({
         {/* Divider */}
 
         <div className="my-6 h-px bg-white/50" />
-
-        {/* Address */}
-
-        <section>
-          <div className="mb-5">
-            <h2 className="text-base font-semibold">
-              Address
-            </h2>
-          </div>
-
-          <div className="grid gap-4 sm:grid-cols-2">
-            <div className="sm:col-span-2">
-              <ProfileField
-                id="addressLine1"
-                label="Address line 1"
-                value={addressLine1}
-                autoComplete="address-line1"
-                onChange={(event) =>
-                  setAddressLine1(event.target.value)
-                }
-              />
-            </div>
-
-            <div className="sm:col-span-2">
-              <ProfileField
-                id="addressLine2"
-                label="Address line 2"
-                value={addressLine2}
-                autoComplete="address-line2"
-                onChange={(event) =>
-                  setAddressLine2(event.target.value)
-                }
-              />
-            </div>
-
-            <ProfileField
-              id="city"
-              label="City"
-              value={city}
-              autoComplete="address-level2"
-              onChange={(event) =>
-                setCity(event.target.value)
-              }
-            />
-
-            <ProfileField
-              id="state"
-              label="State"
-              value={state}
-              autoComplete="address-level1"
-              onChange={(event) =>
-                setState(event.target.value)
-              }
-            />
-
-            <ProfileField
-              id="pinCode"
-              label="PIN code"
-              value={pinCode}
-              autoComplete="postal-code"
-              inputMode="numeric"
-              onChange={(event) =>
-                setPinCode(event.target.value)
-              }
-            />
-          </div>
-        </section>
 
         {/* Actions */}
 

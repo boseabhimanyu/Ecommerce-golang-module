@@ -24,11 +24,6 @@ type Customer = {
   updatedAt: string;
   lastLoginAt?: string | null;
   dateOfBirth?: string | null;
-  addressLine1: string;
-  addressLine2: string;
-  city: string;
-  state: string;
-  pinCode: string;
   twoFactorEnabled: boolean;
 };
 
@@ -39,11 +34,6 @@ type CustomerForm = {
   email: string;
   phone: string;
   dateOfBirth: string;
-  addressLine1: string;
-  addressLine2: string;
-  city: string;
-  state: string;
-  pinCode: string;
 };
 
 const emptyCustomerForm: CustomerForm = {
@@ -53,11 +43,6 @@ const emptyCustomerForm: CustomerForm = {
   email: "",
   phone: "",
   dateOfBirth: "",
-  addressLine1: "",
-  addressLine2: "",
-  city: "",
-  state: "",
-  pinCode: "",
 };
 
 function getErrorMessage(
@@ -145,11 +130,6 @@ function customerToForm(
     dateOfBirth: formatDateForInput(
       customer.dateOfBirth,
     ),
-    addressLine1: customer.addressLine1 ?? "",
-    addressLine2: customer.addressLine2 ?? "",
-    city: customer.city ?? "",
-    state: customer.state ?? "",
-    pinCode: customer.pinCode ?? "",
   };
 }
 
@@ -1245,81 +1225,6 @@ export default function CustomersPage() {
                         onChange={(value) =>
                           updateCustomerForm(
                             "dateOfBirth",
-                            value,
-                          )
-                        }
-                      />
-                    </div>
-
-                    <h3 className="mt-6 text-sm font-semibold text-zinc-900">
-                      Address
-                    </h3>
-
-                    <div className="mt-4 grid gap-4 sm:grid-cols-2">
-                      <div className="sm:col-span-2">
-                        <CustomerField
-                          label="Address line 1"
-                          value={
-                            customerForm.addressLine1
-                          }
-                          onChange={(value) =>
-                            updateCustomerForm(
-                              "addressLine1",
-                              value,
-                            )
-                          }
-                        />
-                      </div>
-
-                      <div className="sm:col-span-2">
-                        <CustomerField
-                          label="Address line 2"
-                          value={
-                            customerForm.addressLine2
-                          }
-                          onChange={(value) =>
-                            updateCustomerForm(
-                              "addressLine2",
-                              value,
-                            )
-                          }
-                        />
-                      </div>
-
-                      <CustomerField
-                        label="City"
-                        value={
-                          customerForm.city
-                        }
-                        onChange={(value) =>
-                          updateCustomerForm(
-                            "city",
-                            value,
-                          )
-                        }
-                      />
-
-                      <CustomerField
-                        label="State"
-                        value={
-                          customerForm.state
-                        }
-                        onChange={(value) =>
-                          updateCustomerForm(
-                            "state",
-                            value,
-                          )
-                        }
-                      />
-
-                      <CustomerField
-                        label="PIN code"
-                        value={
-                          customerForm.pinCode
-                        }
-                        onChange={(value) =>
-                          updateCustomerForm(
-                            "pinCode",
                             value,
                           )
                         }

@@ -12,11 +12,6 @@ export type User = {
   updatedAt: string;
   lastLoginAt: string;
   dateOfBirth?: string | null;
-  addressLine1: string;
-  addressLine2: string;
-  city: string;
-  state: string;
-  pinCode: string;
   twoFactorEnabled: boolean;
   isEmailVerified: boolean;
 };
@@ -44,4 +39,30 @@ export type PagesPagination = {
 export type PagesResponse = {
   pages: Page[];
   pagination: PagesPagination;
+};
+
+export type Address = {
+  id: string;
+  fullName: string;
+  phone: string;
+  line1: string;
+  line2?: string;
+  city: string;
+  state: string;
+  pinCode: string;
+  country: string;
+  isDefault: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+};
+
+export type AddressFormData = {
+  fullName: string;
+  phone: string;
+  line1: string;
+  line2: string;
+  city: string;
+  state: string;
+  pinCode: string;
+  country: string;
 };

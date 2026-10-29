@@ -7,7 +7,7 @@ import {
   useState,
   useEffect,
 } from "react";
-
+import Link from "next/link";
 import api from "@/lib/api";
 import type { User } from "@/lib/types";
 import { useNotification } from "@/components/notifications/notification-provider";
@@ -74,12 +74,6 @@ export default function ProfileFormRoot({
     formatDateForInput(user.dateOfBirth),
   );
 
-  const [addressLine1, setAddressLine1] = useState(user.addressLine1 ?? "");
-  const [addressLine2, setAddressLine2] = useState(user.addressLine2 ?? "");
-  const [city, setCity] = useState(user.city ?? "");
-  const [state, setState] = useState(user.state ?? "");
-  const [pinCode, setPinCode] = useState(user.pinCode ?? "");
-
   const [profilePic, setProfilePic] = useState(user.profilePic ?? "");
   const [profileImageLoading, setProfileImageLoading] = useState(false);
   const [showProfileImage, setShowProfileImage] = useState(false);
@@ -144,11 +138,6 @@ export default function ProfileFormRoot({
         email: email.trim(),
         phone: phone.trim(),
         dateOfBirth: apiDateOfBirth,
-        addressLine1: addressLine1.trim(),
-        addressLine2: addressLine2.trim(),
-        city: city.trim(),
-        state: state.trim(),
-        pinCode: pinCode.trim(),
       });
 
       showNotification(
@@ -433,67 +422,22 @@ export default function ProfileFormRoot({
             backgroundColor: "var(--menu-glass-border)",
           }}
         />
-
-        {/* Address */}
-        <section>
-          <div className="mb-5">
-            <h2
-              className="text-base font-semibold"
-              style={{
-                color: "var(--menu-text)",
-              }}
-            >
-              Address
-            </h2>
-          </div>
-
-          <div className="grid gap-4 sm:grid-cols-2">
-            <div className="sm:col-span-2">
-              <ProfileField
-                id="addressLine1"
-                label="Address line 1"
-                value={addressLine1}
-                autoComplete="address-line1"
-                onChange={(event) => setAddressLine1(event.target.value)}
-              />
-            </div>
-
-            <div className="sm:col-span-2">
-              <ProfileField
-                id="addressLine2"
-                label="Address line 2"
-                value={addressLine2}
-                autoComplete="address-line2"
-                onChange={(event) => setAddressLine2(event.target.value)}
-              />
-            </div>
-
-            <ProfileField
-              id="city"
-              label="City"
-              value={city}
-              autoComplete="address-level2"
-              onChange={(event) => setCity(event.target.value)}
-            />
-
-            <ProfileField
-              id="state"
-              label="State"
-              value={state}
-              autoComplete="address-level1"
-              onChange={(event) => setState(event.target.value)}
-            />
-
-            <ProfileField
-              id="pinCode"
-              label="PIN code"
-              value={pinCode}
-              autoComplete="postal-code"
-              inputMode="numeric"
-              onChange={(event) => setPinCode(event.target.value)}
-            />
-          </div>
-        </section>
+{/* Replaces the old static inputs section */}
+<section className="rounded-2xl border p-4 backdrop-blur-xl" style={{ borderColor: "var(--menu-glass-border)", backgroundColor: "var(--menu-glass)" }}>
+  <div className="flex items-center justify-between">
+    <div>
+      <h3 className="text-sm font-semibold" style={{ color: "var(--menu-text)" }}>Delivery & Billing Addresses</h3>
+      <p className="text-xs" style={{ color: "var(--menu-muted)" }}>Manage multiple saved shipping and billing locations.</p>
+    </div>
+    <Link
+      href="/addresses"
+      className="rounded-xl border px-3.5 py-2 text-xs font-medium transition hover:brightness-95"
+      style={{ backgroundColor: "var(--menu-glass)", borderColor: "var(--menu-glass-border)", color: "var(--menu-text)" }}
+    >
+      Manage Addresses →
+    </Link>
+  </div>
+</section>
 
         {/* Actions */}
         <div className="mt-6 flex justify-end">
