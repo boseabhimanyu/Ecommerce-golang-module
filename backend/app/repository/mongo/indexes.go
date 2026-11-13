@@ -164,3 +164,45 @@ func EnsurePageIndexes(
 
 	return err
 }
+
+// Category Indexes
+
+func EnsureCategoryIndexes(
+	ctx context.Context,
+	db *mongodriver.Database,
+) error {
+	ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
+	defer cancel()
+
+	collection := db.Collection("categories")
+
+	indexes := []mongodriver.IndexModel{
+		{
+			Keys: bson.D{
+				{Key: "slug", Value: 1},
+			},
+			Options: options.Index().
+				SetUnique(true).
+				SetName("unique_category_slug"),
+		},
+		{
+			Keys: bson.D{
+				{Key: "parent_id", Value: 1},
+			},
+			Options: options.Index().
+				SetName("category_parent_id"),
+		},
+		{
+			Keys: bson.D{
+				{Key: "status", Value: 1},
+				{Key: "created_at", Value: -1},
+			},
+			Options: options.Index().
+				SetName("category_status_created_at"),
+		},
+	}
+
+	_, err := collection.Indexes().CreateMany(ctx, indexes)
+
+	return err
+}

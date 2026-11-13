@@ -59,4 +59,17 @@ var (
 	ErrInvalidBackupCode        = errors.New("invalid backup code")
 	ErrTwoFactorResetNotAllowed = errors.New("two-factor reset is not allowed for this user")
 	ErrTwoFactorRequired        = errors.New("Enter 2FA or backup code")
+
+	//Categories
+	ErrCategoryNotFound       = errors.New("category not found")
+	ErrInvalidCategoryID      = errors.New("invalid category id")
+	ErrCategorySlugExists     = errors.New("category slug already exists")
+	ErrCategoryNameRequired   = errors.New("category name is required")
+	ErrInvalidCategoryName    = errors.New("invalid category name")
+	ErrInvalidCategoryParent  = errors.New("invalid category parent")
+	ErrCategoryHasChildren    = errors.New("category has child categories")
+	ErrCategoryCircularParent = errors.New("circular category hierarchy")
+	ErrCategoryInactiveParent = errors.New("parent category is inactive")
+	ErrNoCategoryFields       = errors.New("no category fields to update")
+	ErrInvalidCategoryStatus  = errors.New("invalid category status")
 )

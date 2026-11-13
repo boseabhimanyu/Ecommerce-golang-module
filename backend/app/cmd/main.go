@@ -53,6 +53,12 @@ func main() {
 
 	if err := mongorepo.EnsurePageIndexes(indexCtx, db); err != nil {
 		log.Printf("Failed to create page indexes: %v", err)
+		return
+	}
+
+	if err := mongorepo.EnsureCategoryIndexes(indexCtx, db); err != nil {
+		log.Printf("Failed to create category indexes: %v", err)
+		return
 	}
 
 	refreshTokenRepository := mongorepo.NewRefreshTokenRepository(db)

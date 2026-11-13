@@ -166,6 +166,16 @@ func NewRouter(
 	authHandler := handler.NewAuthHandler(authService, userService, cfg)
 	userHandler := handler.NewUserHandler(userService)
 
+	categoryRepository := mongorepo.NewCategoryRepository(database)
+
+	categoryService := services.NewCategoryService(
+		categoryRepository,
+	)
+
+	categoryHandler := handler.NewCategoryHandler(
+		categoryService,
+	)
+
 	pageRepository := mongorepo.NewPageRepository(database)
 	menuRepository := mongorepo.NewMenuRepository(database)
 	menuService := services.NewMenuService(
@@ -399,6 +409,16 @@ func NewRouter(
 	)
 	protectedSettings.PATCH("", settingsHandler.Update)
 	protectedSettings.GET("", settingsHandler.GetPrivateSettings)
+
+	// ------------------------------------------------------------------
+	// Categories
+	// ------------------------------------------------------------------
+
+	registerCategoryRoutes(
+		r,
+		categoryHandler,
+		authMiddleware,
+	)
 
 	// ------------------------------------------------------------------
 	// Pages
