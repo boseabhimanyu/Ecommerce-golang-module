@@ -219,7 +219,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"firstName\": \"Priya\",\n  \"lastName\": \"Pathak\",\n  \"username\": \"priyap\",\n  \"email\": \"priya@example.com\",\n//   \"altEmail\": \"neeraj@example.com\",\n  \"phone\": \"9685745896\",\n  \"password\": \"Password@123\"\n}",
+              "raw": "{\n  \"firstName\": \"Chnadan\",\n  \"lastName\": \"mahato\",\n  \"username\": \"chandan\",\n  \"email\": \"chandan@example.com\",\n  \"phone\": \"9589636590\",\n  \"password\": \"Cat@1234\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -1516,12 +1516,301 @@
               "response": []
             }
           ]
+        },
+        {
+          "name": "Categories",
+          "item": [
+            {
+              "name": "Add Category",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"name\": \"T\",\n    \"description\": \"\"\n    // \"parentId\" :\"6af7460da537fd4981519d62\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:{{port}}/api/v1/admin/categories",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "{{port}}",
+                  "path": [
+                    "api",
+                    "v1",
+                    "admin",
+                    "categories"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Update Category by ID",
+              "request": {
+                "method": "PATCH",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    // \"name\": \"Furniture\",\n    //  \"description\": \"Check out our wooden products\",\n    // \"parentId\": \"6af73ef588b765d412b2679f\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:{{port}}/api/v1/admin/categories/6af7374788b765d412b2679d",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "{{port}}",
+                  "path": [
+                    "api",
+                    "v1",
+                    "admin",
+                    "categories",
+                    "6af7374788b765d412b2679d"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Update Category Status",
+              "request": {
+                "method": "PATCH",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"status\": true\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:{{port}}/api/v1/admin/categories/6af7374788b765d412b2679d/status",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "{{port}}",
+                  "path": [
+                    "api",
+                    "v1",
+                    "admin",
+                    "categories",
+                    "6af7374788b765d412b2679d",
+                    "status"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Get Admin Category Tree",
+              "protocolProfileBehavior": {
+                "disableBodyPruning": true
+              },
+              "request": {
+                "method": "GET",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"name\": \"Mobiles\",\n     \"description\": \"Check out new mobile phones\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:{{port}}/api/v1/admin/categories/tree",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "{{port}}",
+                  "path": [
+                    "api",
+                    "v1",
+                    "admin",
+                    "categories",
+                    "tree"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Delete Category by ID",
+              "request": {
+                "method": "DELETE",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"name\": \"Mobiles\",\n     \"description\": \"Check out new mobile phones\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:{{port}}/api/v1/admin/categories/6af6a43682012edfc18c26f7",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "{{port}}",
+                  "path": [
+                    "api",
+                    "v1",
+                    "admin",
+                    "categories",
+                    "6af6a43682012edfc18c26f7"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
         }
       ]
     },
     {
       "name": "Public links",
       "item": [
+        {
+          "name": "Categories",
+          "item": [
+            {
+              "name": "Get All Categories",
+              "protocolProfileBehavior": {
+                "disableBodyPruning": true
+              },
+              "request": {
+                "method": "GET",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "\n{\n  \"name\": \"Fashion\",\n  \"description\": \"New desiner clothes\"\n}"
+                },
+                "url": {
+                  "raw": "http://localhost:{{port}}/api/v1/categories?limit=2&page=2&parentId=6af7460da537fd4981519d62",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "{{port}}",
+                  "path": [
+                    "api",
+                    "v1",
+                    "categories"
+                  ],
+                  "query": [
+                    {
+                      "key": "limit",
+                      "value": "2"
+                    },
+                    {
+                      "key": "page",
+                      "value": "2"
+                    },
+                    {
+                      "key": "status",
+                      "value": "true",
+                      "type": "text",
+                      "disabled": true
+                    },
+                    {
+                      "key": "parentId",
+                      "value": "6af7460da537fd4981519d62",
+                      "type": "text"
+                    }
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Get All Categories Tree",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "http://localhost:{{port}}/api/v1/categories/tree",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "{{port}}",
+                  "path": [
+                    "api",
+                    "v1",
+                    "categories",
+                    "tree"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Get Category by Slug",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "http://localhost:{{port}}/api/v1/categories/slug/fashion",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "{{port}}",
+                  "path": [
+                    "api",
+                    "v1",
+                    "categories",
+                    "slug",
+                    "fashion"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Get Category by ID",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "http://localhost:{{port}}/api/v1/categories/6af7374788b765d412b2679d",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "{{port}}",
+                  "path": [
+                    "api",
+                    "v1",
+                    "categories",
+                    "6af7374788b765d412b2679d"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
         {
           "name": "CORS check",
           "request": {
