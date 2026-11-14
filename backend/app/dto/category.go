@@ -29,8 +29,8 @@ type CategoryStatusRequest struct {
 
 // ListCategoriesQuery contains category listing filters.
 type ListCategoriesQuery struct {
-	Page     int     `form:"page"`
-	Limit    int     `form:"limit"`
+	Page     *int    `form:"page"`
+	Limit    *int    `form:"limit"`
 	Status   *bool   `form:"status"`
 	Search   string  `form:"search"`
 	ParentID *string `form:"parentId"`

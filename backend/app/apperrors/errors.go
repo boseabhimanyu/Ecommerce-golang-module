@@ -72,4 +72,6 @@ var (
 	ErrCategoryInactiveParent = errors.New("parent category is inactive")
 	ErrNoCategoryFields       = errors.New("no category fields to update")
 	ErrInvalidCategoryStatus  = errors.New("invalid category status")
+	ErrCategoryNameTooShort   = errors.New("category name must be at least 2 characters")
+	ErrCategoryNameTooLong    = errors.New("category name cannot exceed 100 characters")
 )

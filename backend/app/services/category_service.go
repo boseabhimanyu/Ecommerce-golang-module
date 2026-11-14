@@ -58,8 +58,14 @@ func validateCategoryName(name string) (string, error) {
 		return "", apperrors.ErrCategoryNameRequired
 	}
 
-	if len([]rune(name)) < 2 || len([]rune(name)) > 100 {
-		return "", apperrors.ErrInvalidCategoryName
+	charCount := len([]rune(name))
+
+	if charCount < 2 {
+		return "", apperrors.ErrCategoryNameTooShort
+	}
+
+	if charCount > 100 {
+		return "", apperrors.ErrCategoryNameTooLong
 	}
 
 	return name, nil
@@ -427,7 +433,7 @@ func (s *CategoryService) UpdateCategoryStatus(
 		return nil
 	}
 
-	// When activating a category, its parent must be active.
+	// When activating a category, all its ancestors must be active.
 	if status && category.ParentID != nil {
 		parent, err := s.categoryRepository.FindByID(
 			ctx,
@@ -437,8 +443,11 @@ func (s *CategoryService) UpdateCategoryStatus(
 			return err
 		}
 
-		if !parent.Status {
-			return apperrors.ErrCategoryInactiveParent
+		if err := s.validateActiveAncestors(
+			ctx,
+			parent,
+		); err != nil {
+			return err
 		}
 	}
 
@@ -491,28 +500,33 @@ func (s *CategoryService) ListCategories(
 	ctx context.Context,
 	query dto.ListCategoriesQuery,
 ) (*dto.CategoryListResponse, error) {
-	page := query.Page
 
-	if page == 0 {
-		page = 1
+	// Default pagination values
+	page := 1
+	limit := 20
+
+	// Validate page number
+	if query.Page != nil {
+		if *query.Page < 1 {
+			return nil, apperrors.ErrInvalidPage
+		}
+
+		page = *query.Page
 	}
 
-	if page < 1 {
-		return nil, apperrors.ErrInvalidPage
+	// Validate page size
+	if query.Limit != nil {
+		if *query.Limit < 1 || *query.Limit > 100 {
+			return nil, apperrors.ErrInvalidLimit
+		}
+
+		limit = *query.Limit
 	}
 
-	limit := query.Limit
-
-	if limit == 0 {
-		limit = 20
-	}
-
-	if limit < 1 || limit > 100 {
-		return nil, apperrors.ErrInvalidLimit
-	}
-
+	// Trim search input
 	search := strings.TrimSpace(query.Search)
 
+	// Prepare parent ID filter
 	var parentID *string
 
 	if query.ParentID != nil {
@@ -520,6 +534,7 @@ func (s *CategoryService) ListCategories(
 		parentID = &value
 	}
 
+	// Fetch categories from repository
 	categories, total, err := s.categoryRepository.ListCategories(
 		ctx,
 		repository.CategoryListFilter{
@@ -530,10 +545,12 @@ func (s *CategoryService) ListCategories(
 			Limit:    int64(limit),
 		},
 	)
+
 	if err != nil {
 		return nil, err
 	}
 
+	// Convert categories into response DTOs
 	categoryResponses := make(
 		[]dto.CategoryResponse,
 		0,
@@ -547,12 +564,14 @@ func (s *CategoryService) ListCategories(
 		)
 	}
 
+	// Calculate total pages
 	totalPages := int64(0)
 
 	if total > 0 {
 		totalPages = (total + int64(limit) - 1) / int64(limit)
 	}
 
+	// Return paginated response
 	return &dto.CategoryListResponse{
 		Categories: categoryResponses,
 		Pagination: dto.Pagination{
